@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ER Data Checker — Secure Login</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .login-container {
+      background: #fff;
+      width: 400px;
+      padding: 2.5rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-container h2 {
+      color: #4f46e5;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .login-container p {
+      color: #555;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: #4f46e5;
+    }
+
+    .btn {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #3730a3;
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      min-height: 20px;
+    }
+
+    .footer {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .footer a {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      display: none;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #4f46e5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-container">
+    <h2>Welcome to ER Data Checker</h2>
+    <p>Login to validate your Mix & Paid data securely.</p>
+
+    <div class="input-group">
+      <input type="email" id="email" placeholder="Enter your email" required />
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Enter your password" required />
+    </div>
+
+    <button class="btn" id="loginBtn">Login</button>
+    <div id="error-message" class="error"></div>
+    <div id="loading" class="loading">Logging in, please wait...</div>
+
+    <div class="footer">
+      <p>Don't have an account? <a href="#" id="contactAdmin">Contact Administrator</a></p>
+    </div>
+  </div>
+
+  <script type="module">
+    // Prevent going back to bypass login
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+      window.history.pushState(null, "", window.location.href);
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYLIb4UFMDERgc0T4cUHDWK1oTlpsdqMI",
+      authDomain: "er-data-checker.firebaseapp.com",
+      projectId: "er-data-checker",
+      storageBucket: "er-data-checker.firebasestorage.app",
+      messagingSenderId: "288951811041",
+      appId: "1:288951811041:web:13ca2eedc69bcb450cf0a0",
+      measurementId: "G-5XTTX0P0WV"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+
+    const SESSION_KEY = "er_login_status";
+
+    // If already logged in → go to main page
+    if (localStorage.getItem(SESSION_KEY) === "true") {
+      window.location.href = "er.html";
+    }
+
+    const loginBtn = document.getElementById("loginBtn");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const errorMessage = document.getElementById("error-message");
+    const loadingText = document.getElementById("loading");
+
+    loginBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      errorMessage.textContent = "";
+      loadingText.style.display = "block";
+      loginBtn.disabled = true;
+
+      if (!email || !password) {
+        errorMessage.textContent = "Please enter both email and password.";
+        loadingText.style.display = "none";
+        loginBtn.disabled = false;
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        localStorage.setItem(SESSION_KEY, "true");
+        loadingText.textContent = "Login successful! Redirecting...";
+        setTimeout(() => {
+          window.location.href = "er.html";
+        }, 800);
+      } catch (error) {
+        let message = "Login failed. Please try again.";
+        switch (error.code) {
+          case "auth/invalid-email":
+            message = "Invalid email address format.";
+            break;
+          case "auth/user-disabled":
+            message = "This account has been disabled.";
+            break;
+          case "auth/user-not-found":
+            message = "No account found with this email.";
+            break;
+          case "auth/wrong-password":
+            message = "Incorrect password.";
+            break;
+          case "auth/too-many-requests":
+            message = "Too many failed attempts. Please try again later.";
+            break;
+        }
+        errorMessage.textContent = message;
+      } finally {
+        loadingText.style.display = "none";
+        loginBtn.disabled = false;
+      }
+    });
+
+    // Contact Administrator – no back navigation
+    document.getElementById("contactAdmin").addEventListener("click", (e) => {
+      e.preventDefault();
+      window.location.replace("https://wa.me/8801795541326");
+    });
+  </script>
+</body>
+</html>

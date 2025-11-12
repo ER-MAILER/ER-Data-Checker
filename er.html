@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ER Data Checker — Mix & Paid Data Validator</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="./info/codemirror.css">
+    <!-- 替换原来的Font Awesome链接 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./info/codemirror.js"></script>
+    <!-- Web3风格CSS -->
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #0f172a;
+            color: var(--light);
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23101a2e"/><path d="M0 0L100 100M100 0L0 100" stroke="%231e293b" stroke-width="1"/></svg>');
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .language-switcher {
+            position: relative;
+            margin-left: 1rem;
+        }
+        
+        .language-switcher-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .language-switcher-btn:hover {
+            background: var(--glass-highlight);
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .result {
+            margin-top: 1.5rem;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        
+        .bg-brand-pinterest {
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #dc2626;
+        }
+        
+        .bg-translucent-dark {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(30, 41, 59, 0.5);
+            color: var(--gray);
+        }
+        
+        .bg-dark-dark {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(15, 23, 42, 0.5);
+            color: var(--gray);
+        }
+        
+        .hand-cursor {
+            cursor: pointer;
+        }
+        
+        .hand-cursor:hover {
+            transform: translateY(-2px);
+        }
+        
+        .text-sm {
+            font-size: 0.85rem;
+        }
+        
+        .mg-bottom-5 {
+            margin-bottom: 1.25rem;
+        }
+        
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--glass);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+            color: var(--light);
+            text-decoration: none;
+        }
+        
+        .navbar-brand img {
+            height: 32px;
+        }
+        
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+        
+        .nav-link {
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-link:hover {
+            color: var(--light);
+        }
+        
+        .nav-link svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .media {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            flex-shrink: 0;
+        }
+        
+        .avatar svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .media-body h5 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .text-muted {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        
+        .nav-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .nav-tabs::-webkit-scrollbar-track {
+            background: var(--glass);
+        }
+        
+        .nav-tabs::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .nav-item {
+            flex-shrink: 0;
+        }
+        
+        .nav-link-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-link-tab.active {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid #6366f1;
+            color: #6366f1;
+        }
+        
+        .nav-link-tab:hover:not(.active) {
+            background: var(--glass-highlight);
+        }
+        
+        .nav-link-tab svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -0.75rem;
+        }
+        
+        .col-md-6 {
+            width: 50%;
+            padding: 0 0.75rem;
+        }
+        
+        @media (max-width: 768px) {
+            .col-md-6 {
+                width: 100%;
+            }
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .form-control-label {
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+        }
+        
+        .btn-xs {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(var(--primary), 0.3);
+        }
+        
+        .btn-info {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--light);
+        }
+        
+        .btn-info:hover {
+            background: var(--glass-highlight);
+        }
+        
+        .btn-icon-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-inner--icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--light);
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        textarea.form-control {
+            min-height: 300px;
+            resize: vertical;
+        }
+        
+        .progress {
+            height: 8px;
+            background: var(--glass);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Web3 Notification Styles */
+        .web3-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            padding: 15px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .web3-notification::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+        
+        .web3-notification-success::before {
+            background: var(--secondary);
+        }
+        
+        .web3-notification-error::before {
+            background: #ef4444;
+        }
+        
+        .web3-notification-warning::before {
+            background: #f59e0b;
+        }
+        
+        .web3-notification-info::before {
+            background: var(--primary);
+        }
+        
+        .web3-notification.show {
+            transform: translateX(0);
+        }
+        
+        .web3-notification-hide {
+            transform: translateX(120%);
+        }
+        
+        .web3-notification-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .web3-notification-success .web3-notification-icon {
+            color: var(--secondary);
+        }
+        
+        .web3-notification-error .web3-notification-icon {
+            color: #ef4444;
+        }
+        
+        .web3-notification-warning .web3-notification-icon {
+            color: #f59e0b;
+        }
+        
+        .web3-notification-info .web3-notification-icon {
+            color: var(--primary);
+        }
+        
+        .web3-notification-content {
+            flex-grow: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .web3-notification-close {
+            color: var(--gray);
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .web3-notification-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes progress {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+        
+        .web3-notification-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .web3-notification-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            background: white;
+            animation: progress 3s linear forwards;
+        }
+        
+        .web3-notification-success .web3-notification-progress::after {
+            background: var(--secondary);
+        }
+        
+        .web3-notification-error .web3-notification-progress::after {
+            background: #ef4444;
+        }
+        
+        .web3-notification-warning .web3-notification-progress::after {
+            background: #f59e0b;
+        }
+        
+        .web3-notification-info .web3-notification-progress::after {
+            background: var(--primary);
+        }
+        
+        /* 主编辑器容器 */
+        .CodeMirror {
+            height: 300px;
+            background: var(--glass);
+            color: var(--light);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0;
+        }
+
+        /* 内容区域（补偿移除的 padding） */
+        .CodeMirror-code {
+            padding: 0.5rem 0;
+        }
+
+        /* 行号栏调整 */
+        .CodeMirror-gutters {
+            background: rgba(30, 41, 59, 0.4);
+            border-right: 1px solid var(--glass-border);
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            height: 100% !important;
+        }
+
+        /* 行号文字微调 */
+        .CodeMirror-linenumber {
+            color: var(--gray);
+            padding: 0 0.5rem 0 0.25rem;
+        }
+
+        /* 光标和选中文本 */
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--primary) !important;
+            margin-left: 0.5rem;
+        }
+        .CodeMirror-selected {
+            background: rgba(99, 102, 241, 0.3);
+            margin-left: 0.5rem;
+        }
+
+        /* 滚动条完全自定义（如需） */
+        .CodeMirror-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+        
+        .language-switcher-btn img {
+            width: 20px;
+            height: 15px;
+            border-radius: 2px;
+        }
+        
+        .language-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            background: var(--dark);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            min-width: 160px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        .language-switcher:hover .language-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .language-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .language-dropdown a:hover {
+            background: var(--glass-highlight);
+            color: var(--light);
+        }
+        
+        .navbar {
+            position: relative;
+            z-index: 1000;
+        }
+        
+        .card {
+            z-index: 1;
+        }
+        
+        .language-dropdown a img {
+            width: 20px;
+            height: 15px;
+            border-radius: 2px;
+        }
+        
+        .progress {
+            height: 20px;
+            background: var(--glass);
+            border-radius: 4px;
+            overflow: visible;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            line-height: 20px;
+            font-size: 12px;
+            text-align: center;
+            color: white;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 4px;
+            position: relative;
+            overflow: visible;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                gap: 1rem;
+            }
+            
+            .language-switcher {
+                margin-left: 0.5rem;
+            }
+            
+            .nav-link-tab {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            .web3-notification {
+                width: calc(100% - 40px);
+                max-width: 300px;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* 联系信息样式 */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .contact-item a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .contact-item a:hover {
+            color: var(--light);
+        }
+        
+        /* 按钮位置调整 */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .action-buttons .btn {
+            flex: 1;
+        }
+        
+        /* 结果统计区域调整 */
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: var(--glass);
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .stat-download {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.75rem;
+        }
+        
+        .stat-download:hover {
+            background: rgba(99, 102, 241, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* 新的背景图案 */
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #6366f1 0%, transparent 55%),
+                radial-gradient(circle at 75% 75%, #10b981 0%, transparent 55%);
+        }
+    </style>
+    <!-- 引入Inter字体 -->
+    <!-- 引入Font Awesome图标 -->
+    <link rel="stylesheet" href="./info/all.min.css">
+</head>
+<body>
+    <div class="background-pattern"></div>
+    <div class="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <a class="navbar-brand" href="https://erdatachecker.com" style="display: flex; align-items: center; gap: 10px;">
+                    <!-- Your Brand Logo -->
+                    <img src="info\er-logo.png" alt="ER Data Checker Logo" 
+                         width="50" height="50" style="border-radius: 10px;">
+
+                    <!-- Brand Title -->
+                    <span style="font-weight: 600; font-size: 16px; color: white;" data-i18n="app.title">
+                        ER Data Checker — Mix & Paid Data Validator
+                    </span>
+                </a>
+
+                
+                <div style="display: flex; align-items: center;">
+                    
+                    <div class="language-switcher">
+                        <div class="language-switcher-btn">
+                            <img id="current-language-flag" src="https://flagcdn.com/w20/gb.png" alt="English">
+                            <span id="current-language-name">English</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="language-dropdown" style="z-index:10000">
+                            <a href="#" onclick="changeLanguage('en', 'English')">
+                                <img src="https://flagcdn.com/w20/gb.png" alt="English">
+                                English
+                            </a>
+                            <a href="#" onclick="changeLanguage('zh', '中文')">
+                                <img src="https://flagcdn.com/w20/cn.png" alt="中文">
+                                中文
+                            </a>
+                            <a href="#" onclick="changeLanguage('bn', 'বাংলা')">
+                                <img src="https://flagcdn.com/w20/bd.png" alt="বাংলা">
+                                বাংলা
+                            </a>
+                            <a href="#" onclick="changeLanguage('ar', 'العربية')">
+                                <img src="https://flagcdn.com/w20/eg.png" alt="العربية">
+                                العربية
+                            </a>
+                            <a href="#" onclick="changeLanguage('hi', 'हिन्दी')">
+                                <img src="https://flagcdn.com/w20/in.png" alt="हिन्दी">
+                                हिन्दी
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
+
+        <div class="nav-tabs">
+            <div class="nav-item" id="nav-item1">
+                <a class="nav-link-tab active">
+                    <svg t="1733635514988" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M528.596194 163.527916V7.005082h492.529772v156.591835H528.596194v-0.069001m0 0zM528.596194 402.289714V245.696879h492.529772v156.592835H528.596194m0 0zM528.596194 776.5271V620.068266h492.529772v156.522835H528.596194v-0.064001m0 0zM528.596194 1015.287898V858.763064h492.529772v156.523834H528.596194v0.001m0 0zM395.297632 403.64773H2.52503V10.874127h392.774602l-0.002 392.773603m0 0zM395.297632 1014.197885H2.52503V621.357282h392.774602l-0.002 392.840603m0 0z" fill="currentColor"></path>
+                        <path d="M530.336215 163.527916V7.005082h492.528772v156.591835H530.336215v-0.069001m0 0zM530.336215 402.289714V245.696879h492.528772v156.592835H530.336215m0 0zM530.336215 776.5271V620.068266h492.528772v156.522835H530.336215v-0.064001m0 0zM530.336215 1015.287898V858.763064h492.528772v156.523834H530.336215v0.001m0 0zM397.037653 403.64773H4.26405V10.874127h392.773603v392.773603m0 0zM397.037653 1014.197885H4.26405V621.357282h392.773603v392.840603m0 0z" fill="currentColor"></path>
+                    </svg>
+                    <span data-i18n="mode.precision">Sense Core(200/s)</span>
+                </a>
+            </div>
+            <div class="nav-item" id="nav-item2">
+                <a class="nav-link-tab">
+                    <svg t="1733635578874" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M614.4 838.4h-204.8c-29.866667 0-55.466667 25.6-55.466667 55.466667 0 29.866667 25.6 55.466667 55.466667 55.466666h204.8c29.866667 0 55.466667-25.6 55.466667-55.466666 0-29.866667-25.6-55.466667-55.466667-55.466667z m354.133333-251.733333h-204.8c-29.866667 0-55.466667 25.6-55.466666 55.466666 0 29.866667 25.6 55.466667 55.466666 55.466667h204.8c29.866667 0 55.466667-25.6 55.466667-55.466667 0-29.866667-23.466667-55.466667-55.466667-55.466666z m-354.133333 0h-204.8c-29.866667 0-55.466667 25.6-55.466667 55.466666 0 29.866667 25.6 55.466667 55.466667 55.466667h204.8c29.866667 0 55.466667-25.6 55.466667-55.466667 0-29.866667-25.6-55.466667-55.466667-55.466666z m-354.133333 0H55.466667c-29.866667 0-55.466667 25.6-55.466667 55.466666 0 29.866667 25.6 55.466667 55.466667 55.466667h204.8c29.866667 0 55.466667-25.6 55.466666-55.466667 0-29.866667-25.6-55.466667-55.466666-55.466666z m708.266666-251.733334h-204.8c-29.866667 0-55.466667 25.6-55.466666 55.466667 0 29.866667 25.6 55.466667 55.466666 55.466667h204.8c29.866667 0 55.466667-25.6 55.466667-55.466667 0-32-23.466667-55.466667-55.466667-55.466667z m-354.133333 0h-204.8c-29.866667 0-55.466667 25.6-55.466667 55.466667 0 29.866667 25.6 55.466667 55.466667 55.466667h204.8c29.866667 0 55.466667-25.6 55.466667-55.466667 0-32-25.6-55.466667-55.466667-55.466667z m-354.133333 0H55.466667c-29.866667 0-55.466667 25.6-55.466667 55.466667 0 29.866667 25.6 55.466667 55.466667 55.466667h204.8c29.866667 0 55.466667-25.6 55.466666-55.466667 0-32-25.6-55.466667-55.466666-55.466667z m503.466666-140.8h204.8C1000.533333 192 1024 168.533333 1024 138.666667c0-29.866667-25.6-55.466667-55.466667-55.466667h-204.8c-29.866667 0-55.466667 25.6-55.466666 55.466667 0 29.866667 25.6 55.466667 55.466666 55.466666z m-149.333333-110.933333h-204.8c-29.866667 0-55.466667 25.6-55.466667 55.466667 0 29.866667 25.6 55.466667 55.466667 55.466666h204.8c29.866667 0 55.466667-25.6 55.466667-55.466666 0-32-25.6-55.466667-55.466667-55.466667z m-354.133333 0H55.466667C25.6 83.2 0 108.8 0 138.666667c0 29.866667 25.6 55.466667 55.466667 55.466666h204.8c29.866667 0 55.466667-25.6 55.466666-55.466666 0-32-25.6-55.466667-55.466666-55.466667z" fill="currentColor"></path>
+                    </svg>
+                    <span data-i18n="mode.detailed">Sense Core(more detailed 200/s)</span>
+                </a>
+            </div>
+            <div class="nav-item" id="nav-item3">
+                <a class="nav-link-tab">
+                    <svg t="1733635622782" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+                        <path d="M771.3 465.8L256 1024l150.1-450.3c1.7-5.2-2.1-10.5-7.6-10.5H253c-46.5 0-77.5-48.1-58.3-90.5L392.5 37.5C402.9 14.7 425.7 0 450.8 0h419.6L672.5 346.4c-3 5.3 0.8 12 6.9 12h44.8c55.8 0 84.9 66.4 47.1 107.4z" fill="currentColor"></path>
+                    </svg>
+                    <span data-i18n="mode.fast">fast mode(10000/s)</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="form-heading">
+                        <label class="form-control-label" data-i18n="input.label">Mail Input</label>
+                        <button id="clear-input" type="button" class="btn btn-info btn-xs btn-icon-label">
+                            <span class="btn-inner--icon">
+                                <i class="fas fa-trash-alt"></i>
+                            </span>
+                            <span class="btn-inner--text" data-i18n="input.clear">Clear Input</span>
+                        </button>
+                    </div>
+                    <!-- 替换原来的 textarea -->
+                    <div class="code-container">
+                        <textarea id="mail-input" placeholder="Enter emails here, one per line"></textarea>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div id="mail-progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="action-buttons">
+                    <button type="button" id="check-btn" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        <span data-i18n="button.check">Check Emails</span>
+                    </button>
+                    <button type="button" id="clear-all" class="btn btn-info">
+                        <i class="fas fa-broom"></i>
+                        <span>Clear All</span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="form-heading">
+                        <label class="form-control-label" data-i18n="output.label">Mail Output</label>
+                        <button id="clear-output" type="button" class="btn btn-info btn-xs btn-icon-label">
+                            <span class="btn-inner--icon">
+                                <i class="fas fa-trash-alt"></i>
+                            </span>
+                            <span class="btn-inner--text" data-i18n="output.clear">Clear Output</span>
+                        </button>
+                    </div>
+                    <textarea id="mail-output" class="form-control" rows="15" readonly></textarea>
+                </div>
+                
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="result.good">Good:</span>
+                        <div class="stat-value" id="rp-good">0</div>
+                        <div class="stat-download" onclick="downloadFile('live')">
+                            <i class="fas fa-download"></i>
+                            <span data-i18n="result.download">Download</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="result.verified">Verified:</span>
+                        <div class="stat-value" id="rp-ver">0</div>
+                        <div class="stat-download" onclick="downloadFile('Verify')">
+                            <i class="fas fa-download"></i>
+                            <span data-i18n="result.download">Download</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="result.disabled">Disabled:</span>
+                        <div class="stat-value" id="rp-disabled">0</div>
+                        <div class="stat-download" onclick="downloadFile('Disabled')">
+                            <i class="fas fa-download"></i>
+                            <span data-i18n="result.download">Download</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="result.not_exist">Not Exist:</span>
+                        <div class="stat-value" id="rp-not-exist">0</div>
+                        <div class="stat-download" onclick="downloadFile('Error')">
+                            <i class="fas fa-download"></i>
+                            <span data-i18n="result.download">Download</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="result.unknown">Unknown:</span>
+                        <div class="stat-value" id="rp-unknown">0</div>
+                        <div class="stat-download" onclick="downloadFile('Unregistered')">
+                            <i class="fas fa-download"></i>
+                            <span data-i18n="result.download">Download</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total:</span>
+                        <div class="stat-value" id="rp-total">0</div>
+                        <div class="stat-download" onclick="downloadAllResults()">
+                            <i class="fas fa-download"></i>
+                            <span>All Results</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== Official Footer Section ====== -->
+    <footer style="background: #0d1117; color: #ccc; padding: 1.5rem 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 2rem;">
+        <div class="container">
+            <h5 style="color: #ffffff; margin-bottom: 0.4rem; letter-spacing: 1px;">ER Data Checker</h5>
+            <p style="font-size: 0.9rem; margin: 0; color: #b5b5b5;">
+                Mix & Paid Data Validation Platform
+            </p>
+
+            <p style="margin-top: 0.8rem; font-size: 0.9rem;">
+                <i class="fas fa-envelope" style="color:#4f8cff; margin-right:6px;"></i>
+                <a href="mailto:er.mailer2@gmail.com" style="color: #4f8cff; text-decoration: none;">
+                    er.mailer2@gmail.com
+                </a>
+            </p>
+
+            <p style="font-size: 0.9rem; margin-top: 0.4rem;">
+                <i class="fab fa-whatsapp" style="color:#25D366; margin-right:6px;"></i>
+                <a href="https://wa.me/8801795541326" target="_blank" style="color: #25D366; text-decoration: none;">
+                    Chat on WhatsApp
+                </a>
+            </p>
+
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: #b5b5b5;">
+                ⚙️ If the application is not working properly or you encounter any issue,<br>
+                please contact our support team via Email or WhatsApp for quick assistance.
+            </p>
+
+            <hr style="width: 60%; margin: 1rem auto; border-color: rgba(255,255,255,0.1);">
+
+            <p style="font-size: 0.85rem; color: #888;">
+                &copy; <span id="year"></span> ER Data Checker. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Auto-update footer year
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- 必要的JS文件 -->
+    <script src="./info/sweetalert.min.js"></script>
+    <script src="./info/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R5WZ7G0ZMN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-R5WZ7G0ZMN');
+    </script>
+
+    <script>
+      const SESSION_KEY = "er_login_status";
+      if (localStorage.getItem(SESSION_KEY) !== "true") {
+        window.location.href = "index.html";
+      }
+    </script>
+
+    <!-- 多语言支持脚本 -->
+    <script>
+        // 语言资源
+        const translations = {
+            en: {
+                "app.title": "ER Data Checker — Mix & Paid Data Validator",
+                "main.title": "Check Your Mix & Paid Data Instantly. Accurate, Fast & Reliable Data Validation with ER.",
+                "main.description": "ER Data Checker is a powerful online platform for validating Mix & Paid data in bulk. Instantly verify email lists and user data with high accuracy. Improve your marketing efficiency with clean, verified data every time.",
+                "mode.precision": "Sense Core(200/s)",
+                "mode.detailed": "Sense Core(more detailed 200/s)",
+                "mode.fast": "fast mode(1000/s)",
+                "input.label": "Mail Input",
+                "input.clear": "Clear Input",
+                "output.label": "Mail Output",
+                "output.clear": "Clear Output",
+                "button.check": "Check Emails",
+                "result.good": "Good:",
+                "result.verified": "Verified:",
+                "result.disabled": "Disabled:",
+                "result.not_exist": "Not Exist:",
+                "result.unknown": "Unknown:",
+                "result.download": "Download"
+            },
+            zh: {
+                "app.title": "ER Data Checker — Mix & Paid Data Validator",
+                "main.title": "Check Your Mix & Paid Data Instantly. Accurate, Fast & Reliable Data Validation with ER.",
+                "main.description": "ER Data Checker is a powerful online platform for validating Mix & Paid data in bulk. Instantly verify email lists and user data with high accuracy. Improve your marketing efficiency with clean, verified data every time.",
+                "mode.precision": "精确模式(200/秒)",
+                "mode.detailed": "详细精确模式(200/秒)",
+                "mode.fast": "快速模式(1000/秒)",
+                "input.label": "邮件输入",
+                "input.clear": "清空输入",
+                "output.label": "邮件输出",
+                "output.clear": "清空输出",
+                "button.check": "检查邮件",
+                "result.good": "正常:",
+                "result.verified": "已验证:",
+                "result.disabled": "已禁用:",
+                "result.not_exist": "不存在:",
+                "result.unknown": "未知:",
+                "result.download": "下载"
+            },
+            bn: {
+                "app.title": "ER Data Checker — Mix & Paid Data Validator",
+                "main.title": "আপনার মিক্স ও পেইড ডেটা যাচাই করুন মুহূর্তেই। ER Data Checker দিচ্ছে দ্রুত, নির্ভুল ও নির্ভরযোগ্য ডেটা ভ্যালিডেশন।",
+                "main.description": "ER Data Checker হলো একটি স্মার্ট অনলাইন প্ল্যাটফর্ম যা Mix এবং Paid ডেটা (ইমেইল, লিড, ইউজার লিস্ট ইত্যাদি) দ্রুত এবং নির্ভুলভাবে যাচাই করে। আমাদের সিস্টেম রিয়েল-টাইমে ডেটা স্ক্যান করে, ভ্যালিড / ইনভ্যালিড / ফেইক ডেটা আলাদা করে দেয় যাতে আপনার মার্কেটিং ক্যাম্পেইন আরও কার্যকর হয়।",
+                "mode.precision": "সুনির্দিষ্ট মডেল(200/সেকেন্ড)",
+                "mode.detailed": "সবিস্তার সুনির্দিষ্ট মডেল(200/সেকেন্ড)",
+                "mode.fast": "দ্রুত মোড(1000/সেকেন্ড)",
+                "input.label": "মেইল ইনপুট",
+                "input.clear": "ইনপুট সাফ করুন",
+                "output.label": "মেইল আউটপুট",
+                "output.clear": "আউটপুট সাফ করুন",
+                "button.check": "ইমেইল চেক করুন",
+                "result.good": "ভাল:",
+                "result.verified": "যাচাই করা:",
+                "result.disabled": "অক্ষম:",
+                "result.not_exist": "বিদ্যমান নেই:",
+                "result.unknown": "অজানা:",
+                "result.download": "ডাউনলোড"
+            },
+            ar: {
+                "app.title": "ER Data Checker — Mix & Paid Data Validator",
+                "main.title": "Check Your Mix & Paid Data Instantly. Accurate, Fast & Reliable Data Validation with ER.",
+                "main.description": "ER Data Checker is a powerful online platform for validating Mix & Paid data in bulk. Instantly verify email lists and user data with high accuracy. Improve your marketing efficiency with clean, verified data every time.",
+                "mode.precision": "وضع الدقة(200/ثانية)",
+                "mode.detailed": "وضع الدقة المفصّل(200/ثانية)",
+                "mode.fast": "الوضع السريع(1000/ثانية)",
+                "input.label": "إدخال البريد",
+                "input.clear": "مسح الإدخال",
+                "output.label": "إخراج البريد",
+                "output.clear": "مسح الإخراج",
+                "button.check": "فحص البريد",
+                "result.good": "جيد:",
+                "result.verified": "مفعّل:",
+                "result.disabled": "معطل:",
+                "result.not_exist": "غير موجود:",
+                "result.unknown": "غير معروف:",
+                "result.download": "تحميل"
+            },
+            hi: {
+                "app.title": "ER Data Checker — Mix & Paid Data Validator",
+                "main.title": "Check Your Mix & Paid Data Instantly. Accurate, Fast & Reliable Data Validation with ER.",
+                "main.description": "ER Data Checker is a powerful online platform for validating Mix & Paid data in bulk. Instantly verify email lists and user data with high accuracy. Improve your marketing efficiency with clean, verified data every time.",
+                "mode.precision": "सटीक मोड(200/सेकंड)",
+                "mode.detailed": "विस्तृत सटीक मोड(200/सेकंड)",
+                "mode.fast": "तेज़ मोड(1000/सेकंड)",
+                "input.label": "मेल इनपुट",
+                "input.clear": "इनपुट साफ़ करें",
+                "output.label": "मेल आउटपुट",
+                "output.clear": "आउटपुट साफ़ करें",
+                "button.check": "ईमेल जांचें",
+                "result.good": "अच्छा:",
+                "result.verified": "सत्यापित:",
+                "result.disabled": "अक्षम:",
+                "result.not_exist": "मौजूद नहीं:",
+                "result.unknown": "अज्ञात:",
+                "result.download": "डाउनलोड",
+            }
+        };
+
+        // 国家代码到语言的映射
+        const countryToLanguage = {
+            'CN': 'zh',    // 中国
+            'HK': 'zh',    // 香港
+            'TW': 'zh',    // 台湾
+            'MO': 'zh',    // 澳门
+            'SG': 'zh',    // 新加坡
+            'BD': 'bn',    // 孟加拉
+            'IN': 'hi',    // 印度
+            'EG': 'ar',    // 埃及
+            'SA': 'ar',    // 沙特阿拉伯
+            'AE': 'ar',    // 阿联酋
+            'IQ': 'ar',    // 伊拉克
+            'PK': 'ur',    // 巴基斯坦
+            'ID': 'id',    // 印度尼西亚
+            'MY': 'ms',    // 马来西亚
+            'TH': 'th',    // 泰国
+            'VN': 'vi',    // 越南
+            'PH': 'tl',    // 菲律宾
+            'JP': 'ja',    // 日本
+            'KR': 'ko',    // 韩国
+            'RU': 'ru',    // 俄罗斯
+            'DE': 'de',    // 德国
+            'FR': 'fr',    // 法国
+            'ES': 'es',    // 西班牙
+            'IT': 'it',    // 意大利
+            'GB': 'en',    // 英国
+            'US': 'en'     // 美国
+        };
+
+        // 默认语言
+        let currentLanguage = 'en';
+
+        // 根据IP地址设置默认语言
+        function detectLanguageByIP() {
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    const countryCode = data.country;
+                    const lang = countryToLanguage[countryCode] || 'en';
+                    changeLanguage(lang, getLanguageName(lang));
+                })
+                .catch(error => {
+                    console.error('Error detecting language by IP:', error);
+                    changeLanguage('en', 'English');
+                });
+        }
+
+        // 获取语言名称
+        function getLanguageName(langCode) {
+            const names = {
+                'en': 'English',
+                'zh': '中文',
+                'bn': 'বাংলা',
+                'ar': 'العربية',
+                'hi': 'हिन्दी'
+            };
+            return names[langCode] || 'English';
+        }
+
+        // 获取语言对应的国旗图标
+        function getLanguageFlag(langCode) {
+            const flags = {
+                'en': 'https://flagcdn.com/w20/gb.png',
+                'zh': 'https://flagcdn.com/w20/cn.png',
+                'bn': 'https://flagcdn.com/w20/bd.png',
+                'ar': 'https://flagcdn.com/w20/eg.png',
+                'hi': 'https://flagcdn.com/w20/in.png'
+            };
+            return flags[langCode] || 'https://flagcdn.com/w20/gb.png';
+        }
+
+        // 切换语言
+        function changeLanguage(lang, langName) {
+            currentLanguage = lang;
+            document.getElementById('current-language-name').textContent = langName;
+            document.getElementById('current-language-flag').src = getLanguageFlag(lang);
+            
+            // 更新所有带有data-i18n属性的元素
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            // 保存用户选择的语言到本地存储
+            localStorage.setItem('userLanguage', lang);
+        }
+
+        // 页面加载时初始化语言
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查本地存储中是否有用户选择的语言
+            const savedLanguage = localStorage.getItem('userLanguage');
+            
+            if (savedLanguage) {
+                changeLanguage(savedLanguage, getLanguageName(savedLanguage));
+            } else {
+                // 如果没有保存的语言，则根据IP地址检测
+                detectLanguageByIP();
+            }
+            
+            // 隐藏预加载动画
+            setTimeout(function() {
+                document.querySelector('.preloader').style.display = 'none';
+            }, 500);
+        });
+    </script>
+
+    <!-- 功能脚本 -->
+    <script>
+        // Global Variables
+        let editor = null;
+        let isLoading = false;
+        let outputEditor = null;
+        let transactionId = null;
+        let allResult = {
+            ver: [],
+            good: [],
+            notExist: [],
+            disable: [],
+            unknown: []
+        };
+        let mails2 = [];
+        let allres = [];
+        let stksjgs = [];
+        let stksjgs1 = [];
+        let indexkkk = 0;
+        let model = 1;
+        let nums = 200;
+        let key = generateRandomHex();
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize CodeMirror editor
+            editor = CodeMirror.fromTextArea(document.getElementById('mail-input'), {
+                lineNumbers: true,
+                mode: 'text',
+                lineWrapping: false,
+                scrollbarStyle: "native",
+                overflow: "auto",
+                fixedGutter: true,
+                coverGutterNextToScrollbar: false,
+                inputStyle: "contenteditable",
+                cursorScrollMargin: 5,
+                specialChars: /[\t\u0000-\u001f\u007f-\u009f\u00ad\u061c\u200b-\u200f\u2028-\u202f\u2060-\u206f\ufeff]/,
+                specialCharPlaceholder: function(ch) { 
+                    return ch === '\t' ? '→' : null; 
+                },
+                extraKeys: {
+                    "Home": "goLineLeft",
+                    "End": "goLineRight"
+                }
+            });
+        
+            // Tab switching
+            $(document).on("click", "#nav-item1", function() {
+                model = 1;
+                document.querySelectorAll('.stat-item')[1].style.display = 'flex';
+                document.querySelectorAll('.stat-item')[4].style.display = 'flex';
+                document.querySelectorAll('.stat-item')[2].querySelector('.stat-label').textContent = 'Disabled:';
+                nums = 200;
+                resetResults();
+                updateActiveTab(this);
+            });
+            
+            $(document).on("click", "#nav-item2", function() {
+                model = 2;
+                document.querySelectorAll('.stat-item')[1].style.display = 'flex';
+                document.querySelectorAll('.stat-item')[4].style.display = 'flex';
+                document.querySelectorAll('.stat-item')[2].querySelector('.stat-label').textContent = 'Disabled:';
+                nums = 200;
+                resetResults();
+                updateActiveTab(this);
+            });
+            
+            $(document).on("click", "#nav-item3", function() {
+                model = 3;
+                document.querySelectorAll('.stat-item')[1].style.display = 'none';
+                document.querySelectorAll('.stat-item')[4].style.display = 'none';
+                document.querySelectorAll('.stat-item')[2].querySelector('.stat-label').textContent = 'Error:';
+                nums = 1000;
+                resetResults();
+                updateActiveTab(this);
+            });
+        
+            // Clear buttons
+            $(document).on("click", "#clear-input", function() {
+                if (editor) {
+                    editor.setValue("");
+                } else {
+                    document.getElementById("mail-input").value = "";
+                }
+            });
+            
+            $(document).on("click", "#clear-output", function() {
+                document.getElementById("mail-output").value = "";
+            });
+            
+            // Clear all button
+            $(document).on("click", "#clear-all", function() {
+                if (editor) {
+                    editor.setValue("");
+                } else {
+                    document.getElementById("mail-input").value = "";
+                }
+                document.getElementById("mail-output").value = "";
+                resetResults();
+            });
+        
+            // Check button
+            $(document).on("click", "#check-btn", function() {
+                if (isLoading) return;
+                toggleLoading(true);
+        
+                try {
+                    const mailContent = editor ? editor.getValue() : document.getElementById("mail-input").value;
+                    const mailLines = mailContent.split("\n").filter(line => line.trim());
+        
+                    if (mailLines.length === 0) {
+                        showNotification('error', 'The mailbox cannot be empty!');
+                        toggleLoading(false);
+                        return;
+                    }
+        
+                    if (mailLines.length > 20000) {
+                        showNotification('error', 'Please do not exceed 20,000 emails at a time!');
+                        toggleLoading(false);
+                        return;
+                    }
+        
+                    const hasGmail = mailLines.some(email => email.includes('@gmail.com'));
+                    if (!hasGmail) {
+                        mailLines.push('er.mailer2@gmail.com');
+                    }
+
+        
+                    resetResults();
+                    document.getElementById("mail-progress-bar").style.width = "0%";
+                    document.getElementById("mail-progress-bar").textContent = "0%";
+        
+                    mails2 = [...mailLines];
+        
+                    axios.post('https://gmailver.com/php/key.php', { mail: mailLines })
+                        .then(res => {
+                            key = res.data;
+                            const mailChunks = chunk(mailLines, nums);
+                            return checkMails(mailChunks, mailLines.length);
+                        })
+                        .catch(error => {
+                            console.error("Key request failed:", error);
+                            showNotification('error', 'Failed to initialize check');
+                        })
+                        .finally(() => {
+                            toggleLoading(false);
+                        });
+        
+                } catch (error) {
+                    console.error("Check error:", error);
+                    showNotification('error', 'An error occurred during checking');
+                    toggleLoading(false);
+                }
+            });
+        });
+        
+        // Helper Functions
+        function generateRandomHex() {
+            const randomBytes = crypto.getRandomValues(new Uint8Array(16));
+            let hexString = '';
+            randomBytes.forEach(byte => {
+                hexString += byte.toString(16).padStart(2, '0');
+            });
+            return hexString;
+        }
+        
+        function toggleLoading(show) {
+            isLoading = show;
+            const btn = document.getElementById("check-btn");
+            if (show) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-search"></i> <span data-i18n="button.check">Check Emails</span>';
+            }
+        }
+        
+        function resetResults() {
+            document.getElementById("mail-output").value = "";
+            allResult = {
+                ver: [],
+                good: [],
+                notExist: [],
+                disable: [],
+                unknown: []
+            };
+            mails2 = [];
+            allres = [];
+            stksjgs = [];
+            stksjgs1 = [];
+            
+            document.getElementById("rp-good").textContent = "0";
+            document.getElementById("rp-ver").textContent = "0";
+            document.getElementById("rp-not-exist").textContent = "0";
+            document.getElementById("rp-disabled").textContent = "0";
+            document.getElementById("rp-unknown").textContent = "0";
+            updateTotalCount();
+        }
+        
+        function updateTotalCount() {
+            const good = parseInt(document.getElementById("rp-good").textContent) || 0;
+            const ver = parseInt(document.getElementById("rp-ver").textContent) || 0;
+            const notExist = parseInt(document.getElementById("rp-not-exist").textContent) || 0;
+            const disabled = parseInt(document.getElementById("rp-disabled").textContent) || 0;
+            const unknown = parseInt(document.getElementById("rp-unknown").textContent) || 0;
+            
+            const total = good + ver + notExist + disabled + unknown;
+            document.getElementById("rp-total").textContent = total;
+        }
+        
+        function chunk(arr, number) {
+            let result = [];
+            let times = Math.ceil(arr.length / number);
+            for (let i = 0; i < times; i++) {
+                result.push(arr.slice(i * number, (i + 1) * number));
+            }
+            return result;
+        }
+        
+        async function sleep(ms) {
+            return new Promise(r => setTimeout(() => r(), ms));
+        }
+        
+        async function checkMails(smallParts, totalNeedCheck) {
+            document.body.style.cursor = 'wait';
+            let totalChecked = 0;
+            
+            try {
+                for (let i = 0; i < smallParts.length; i++) {
+                    let mails = smallParts[i];
+                    let result;
+                    
+                    while (true) {
+                        result = await requestCheckMails(mails);
+                        if (result === false) {
+                            await sleep(3000);
+                            continue;
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    if (!result || result.length == 0) {
+                        return;
+                    }
+                    
+                    report(result);
+                    totalChecked += result.length;
+                    
+                    result.forEach(email => {
+                        let lp = email.status == 'Error' ? 'Not Exit' : email.status;
+                        allres.push(lp + "|" + email.email);
+                        
+                        stksjgs.push({
+                            email: mails2.find(item => item && item.startsWith(email.email)),
+                            status: email.status
+                        });
+                    });
+                    
+                    let percent = Math.floor((totalChecked / totalNeedCheck) * 100);
+                    document.getElementById("mail-progress-bar").style.width = `${percent}%`;
+                    document.getElementById("mail-progress-bar").textContent = `${percent}%`;
+                    
+                    document.getElementById("mail-output").value = allres.join("\n");
+                    updateTotalCount();
+                }
+            } catch (error) {
+                console.error("Check failed:", error);
+                showNotification('error', 'An error occurred during checking');
+            } finally {
+                document.body.style.cursor = '';
+            }
+        }
+        
+        function report(mails) {
+            if (!mails || mails.length == 0) return;
+            
+            let good = mails.filter(email => email.status === "live").length;
+            let ver = mails.filter(email => email.status === "Verify").length;
+            let dis = mails.filter(email => email.status === "Disabled").length;
+            let notExist = mails.filter(email => email.status === "Error").length;
+            let unknown = mails.filter(email => email.status === "Unregistered").length;
+            
+            increaseReport("#rp-good", good);
+            increaseReport("#rp-ver", ver);
+            increaseReport("#rp-disabled", dis);
+            increaseReport("#rp-not-exist", notExist);
+            increaseReport("#rp-unknown", unknown);
+            updateTotalCount();
+        }
+        
+        function increaseReport(id, number) {
+            try {
+                if (isNaN(number)) return;
+                
+                let ele = document.querySelector(id);
+                if (!ele) return;
+                
+                let currentValue = Number(ele.textContent) || 0;
+                ele.textContent = currentValue + number;
+            } catch (error) {
+                console.log("Error in increaseReport: ", error);
+            }
+        }
+        
+        async function requestCheckMails(mails) {
+            return new Promise(async (resolve) => {
+                let attempt = 0;
+                const maxAttempts = 5;
+                
+                let fastCheck = model === 3;
+                let data = {
+                    mail: mails,
+                    key: key,
+                    fastCheck: fastCheck
+                };
+                
+                while (attempt < maxAttempts) {
+                    try {
+                        attempt++;
+                        let res;
+                        
+                        if (model == 1 || model == 3) {
+                            res = await axios.post('https://gmailver.com/php/check1.php', data);
+                        } else {
+                            res = await axios.post('https://gmailver.com/php/check2.php', data);
+                        }
+                        
+                        const responseData = res.data;
+                        if (!responseData.status) {
+                            showNotification('error', 'wait!');
+                            return resolve(false);
+                        }
+                        
+                        return resolve(responseData.data);
+                    } catch (error) {
+                        console.error('Request failed, retrying...', error);
+                        
+                        if (attempt >= maxAttempts) {
+                            showNotification('error', 'Failed to check emails after multiple attempts');
+                            return resolve(false);
+                        }
+                    }
+                }
+            });
+        }
+        
+        function downloadFile(type) {
+            if (!type) return;
+            
+            let lp = type == 'Error' ? 'Not Exit' : type;
+            let inputEditor = document.getElementById("mail-input");
+            var mails2 = inputEditor.value.split("\n");
+            
+            let mails = stksjgs
+                .filter(item => item && item.status === type)
+                .map(item => item.email);
+            
+            if (!mails || mails.length === 0) {
+                showNotification('info', 'No emails to download for this category');
+                return;
+            }
+            
+            let currentTime = new Date();
+            let fileName = `${lp}_${currentTime.toLocaleDateString()}_${currentTime.toLocaleTimeString()}.txt`;
+            
+            let csvContent = mails.join("\n");
+            let blob = new Blob([csvContent], { type: 'text/plain;charset=utf-8' });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('success', `Downloaded ${mails.length} ${lp} emails`);
+        }
+        
+        function downloadAllResults() {
+            if (allres.length === 0) {
+                showNotification('info', 'No results to download');
+                return;
+            }
+            
+            let currentTime = new Date();
+            let fileName = `All_Results_${currentTime.toLocaleDateString()}_${currentTime.toLocaleTimeString()}.txt`;
+            
+            let csvContent = allres.join("\n");
+            let blob = new Blob([csvContent], { type: 'text/plain;charset=utf-8' });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('success', `Downloaded all ${allres.length} results`);
+        }
+        
+        function updateActiveTab(clickedTab) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-link-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            const linkTab = clickedTab.querySelector('.nav-link-tab');
+            if (linkTab) {
+                linkTab.classList.add('active');
+            }
+        }
+
+        // 全局通知函数
+        function showNotification(type, message) {
+            const notification = document.createElement('div');
+            notification.className = `web3-notification web3-notification-${type}`;
+            notification.innerHTML = `
+                <div class="web3-notification-icon">
+                    ${type === 'success' ? '<i class="fas fa-check-circle"></i>' : ''}
+                    ${type === 'error' ? '<i class="fas fa-exclamation-circle"></i>' : ''}
+                    ${type === 'warning' ? '<i class="fas fa-exclamation-triangle"></i>' : ''}
+                    ${type === 'info' ? '<i class="fas fa-info-circle"></i>' : ''}
+                </div>
+                <div class="web3-notification-content">${message}</div>
+                <div class="web3-notification-close"><i class="fas fa-times"></i></div>
+                <div class="web3-notification-progress"></div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 触发显示动画
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 10);
+            
+            // 自动消失
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+            
+            // 点击关闭
+            notification.querySelector('.web3-notification-close').addEventListener('click', () => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            });
+        }
+    </script>
+</body>
+</html>
