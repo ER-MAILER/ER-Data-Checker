@@ -1664,7 +1664,7 @@
             }
             
             let currentTime = new Date();
-            let fileName = `${lp}_${currentTime.toLocaleDateString()}_${currentTime.toLocaleTimeString()}.txt`;
+            let fileName = `ER-Data-Checker_${lp}_${currentTime.toLocaleDateString()}_${currentTime.toLocaleTimeString()}.txt`;
             
             let csvContent = mails.join("\n");
             let blob = new Blob([csvContent], { type: 'text/plain;charset=utf-8' });
@@ -1753,4 +1753,5 @@
         }
     </script>
 </body>
+
 </html>
