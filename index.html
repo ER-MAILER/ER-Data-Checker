@@ -145,9 +145,6 @@
         import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
 
-        // --------------------------
-        // Firebase Configuration
-        // --------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyCYLIb4UFMDERgc0T4cUHDWK1oTlpsdqMI",
             authDomain: "er-data-checker.firebaseapp.com",
@@ -162,35 +159,22 @@
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
 
-        // --------------------------
-        // If already logged in (same tab only)
-        // --------------------------
-        if (sessionStorage.getItem("isLoggedIn") === "true") {
+        /* ---------------------
+           If already logged in (same tab)
+        ---------------------- */
+        if (sessionStorage.getItem("er_logged_in") === "true") {
             window.location.replace("er.html");
         }
 
-        // --------------------------
-        // Prevent Back Navigation Login Bypass
-        // --------------------------
+        /* ---------------------
+           Prevent back button login bypass
+        ---------------------- */
         window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function () {
-            window.history.pushState(null, "", window.location.href);
-        };
+        window.onpopstate = () => window.history.pushState(null, "", window.location.href);
 
-        // --------------------------
-        // Contact Administrator (back disabled)
-        // --------------------------
-        const contactAdmin = document.getElementById("contactAdmin");
-        if (contactAdmin) {
-            contactAdmin.addEventListener("click", (e) => {
-                e.preventDefault();
-                window.location.replace("https://wa.me/8801795541326");
-            });
-        }
-
-        // --------------------------
-        // Login Logic
-        // --------------------------
+        /* ---------------------
+           Login System
+        ---------------------- */
         const loginBtn = document.getElementById("loginBtn");
         const emailInput = document.getElementById("email");
         const passwordInput = document.getElementById("password");
@@ -201,7 +185,6 @@
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
 
-            // Reset
             errorMessage.textContent = "";
             loadingText.style.display = "block";
             loginBtn.disabled = true;
@@ -216,39 +199,20 @@
             try {
                 await signInWithEmailAndPassword(auth, email, password);
 
-                // --------------------------
-                // Save session only for this tab
-                // --------------------------
-                sessionStorage.setItem("isLoggedIn", "true");
+                // SAVE SESSION (browser tab only)
+                sessionStorage.setItem("er_logged_in", "true");
 
                 loadingText.textContent = "Login successful! Redirecting...";
-
                 setTimeout(() => {
                     window.location.replace("er.html");
-                }, 900);
-
+                }, 700);
             } catch (error) {
-                let message = "Login failed. Please try again.";
+                let msg = "Login failed.";
+                if (error.code === "auth/wrong-password") msg = "Wrong password.";
+                if (error.code === "auth/user-not-found") msg = "User not found.";
+                if (error.code === "auth/invalid-email") msg = "Invalid email.";
+                errorMessage.textContent = msg;
 
-                switch (error.code) {
-                    case "auth/invalid-email":
-                        message = "Invalid email address.";
-                        break;
-                    case "auth/user-disabled":
-                        message = "This account has been disabled.";
-                        break;
-                    case "auth/user-not-found":
-                        message = "Account not found.";
-                        break;
-                    case "auth/wrong-password":
-                        message = "Incorrect password.";
-                        break;
-                    case "auth/too-many-requests":
-                        message = "Too many failed attempts. Try again later.";
-                        break;
-                }
-
-                errorMessage.textContent = message;
                 loadingText.style.display = "none";
                 loginBtn.disabled = false;
             }
@@ -257,5 +221,6 @@
 
 </body>
 </html>
+
 
 
