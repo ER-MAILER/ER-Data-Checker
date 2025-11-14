@@ -1083,22 +1083,13 @@
     </script>
 
     <script>
-        const SESSION_KEY = "er_login_status";
-
-        // -------------------------
-        // Block access if not logged in
-        // -------------------------
-        if (localStorage.getItem(SESSION_KEY) !== "true") {
+        if (sessionStorage.getItem("er_logged_in") !== "true") {
             window.location.replace("index.html");
         }
 
-        // -------------------------
-        // Prevent Login Bypass (Back Button Block)
-        // -------------------------
         window.history.pushState(null, "", window.location.href);
-        window.onpopstate = function () {
+        window.onpopstate = () =>
             window.history.pushState(null, "", window.location.href);
-        };
     </script>
 
     <!-- 多语言支持脚本 -->
@@ -1767,4 +1758,5 @@
 </body>
 
 </html>
+
 
