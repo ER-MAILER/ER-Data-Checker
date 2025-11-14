@@ -845,22 +845,35 @@
         <div class="spinner"></div>
     </div>
 
-    <nav class="navbar">
+    <nav class="navbar" style="padding: 10px 0; background: #111827;">
         <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <a class="navbar-brand" href="https://erdatachecker.com" style="display: flex; align-items: center; gap: 10px;">
-                    <!-- Your Brand Logo -->
-                    <img src="info\er-logo.png" alt="ER Data Checker Logo" 
-                         width="50" height="50" style="border-radius: 10px;">
+            <div style="display: flex; justify-content: center; align-items: center; width: 100%; position: relative;">
 
-                    <!-- Brand Title -->
-                    <span style="font-weight: 600; font-size: 16px; color: white;" data-i18n="app.title">
-                        ER Data Checker — Mix & Paid Data Validator
-                    </span>
+                <!-- Left Logo -->
+                <a class="navbar-brand" 
+                   href="https://erdatachecker.com" 
+                   style="display: flex; align-items: center; gap: 12px; position: absolute; left: 0;">
+                    
+                    <img src="info/er-logo.png" 
+                         alt="ER Checker" 
+                         width="60" height="60"
+                         style="border-radius: 12px;">
+
                 </a>
 
-                
-                <div style="display: flex; align-items: center;">
+                <!-- Center Title -->
+                <span style="
+                    font-weight: 700; 
+                    font-size: 20px; 
+                    color: white; 
+                    text-align: center;
+                    letter-spacing: 0.5px;
+                ">
+                    ER Data Checker — Mix & Paid Data Validator
+                </span>
+
+                <!-- Right Language Switcher -->
+                <div style="display: flex; align-items: center; position: absolute; right: 0;">
                     
                     <div class="language-switcher">
                         <div class="language-switcher-btn">
@@ -868,33 +881,136 @@
                             <span id="current-language-name">English</span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
+
                         <div class="language-dropdown" style="z-index:10000">
                             <a href="#" onclick="changeLanguage('en', 'English')">
-                                <img src="https://flagcdn.com/w20/gb.png" alt="English">
-                                English
+                                <img src="https://flagcdn.com/w20/gb.png" alt="English"> English
                             </a>
                             <a href="#" onclick="changeLanguage('zh', '中文')">
-                                <img src="https://flagcdn.com/w20/cn.png" alt="中文">
-                                中文
+                                <img src="https://flagcdn.com/w20/cn.png" alt="中文"> 中文
                             </a>
                             <a href="#" onclick="changeLanguage('bn', 'বাংলা')">
-                                <img src="https://flagcdn.com/w20/bd.png" alt="বাংলা">
-                                বাংলা
+                                <img src="https://flagcdn.com/w20/bd.png" alt="বাংলা"> বাংলা
                             </a>
                             <a href="#" onclick="changeLanguage('ar', 'العربية')">
-                                <img src="https://flagcdn.com/w20/eg.png" alt="العربية">
-                                العربية
+                                <img src="https://flagcdn.com/w20/eg.png" alt="العربية"> العربية
                             </a>
                             <a href="#" onclick="changeLanguage('hi', 'हिन्दी')">
-                                <img src="https://flagcdn.com/w20/in.png" alt="हिन्दी">
-                                हिन्दी
+                                <img src="https://flagcdn.com/w20/in.png" alt="हिन्दी"> हिन्दी
                             </a>
                         </div>
                     </div>
+
                 </div>
+
             </div>
         </div>
     </nav>
+
+
+    <style>
+        .er-tools-box {
+            margin: 40px auto;
+            width: 100%;
+            max-width: 850px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .tool-card {
+            width: 170px;
+            height: 190px;
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 18px;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s ease-in-out;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+            cursor: pointer;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-7px) scale(1.05);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 6px 35px rgba(0,0,0,0.55);
+        }
+
+        .tool-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            transition: .3s;
+        }
+
+        .tool-card:hover .tool-logo {
+            transform: scale(1.12);
+        }
+
+        .tool-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            letter-spacing: .4px;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .er-tools-header {
+            text-align: center;
+            color: white;
+            font-size: 26px;
+            margin-top: 35px;
+            font-weight: 700;
+            letter-spacing: .5px;
+        }
+    </style>
+
+    <h2 class="er-tools-header">ER Official Tools</h2>
+
+    <div class="er-tools-box">
+
+        <!-- ER Mailer -->
+        <div class="tool-card"
+             onclick="window.open('https://er-mailer.github.io/ER-Mailer---Download-Center/', '_blank')">
+            <img src="info/er-mailer.png" class="tool-logo">
+            <div class="tool-title">Email blasting software</div>
+        </div>
+
+        <!-- ER Ghost Scraper -->
+        <div class="tool-card"
+             onclick="window.open('https://er-mailer.github.io/ER-Ghost-Scraper/', '_blank')">
+            <img src="info/er-ghost.png" class="tool-logo">
+            <div class="tool-title">Data collecting software</div>
+        </div>
+
+        <!-- ER MS365 Tool -->
+        <div class="tool-card"
+             onclick="window.open('https://er-mailer.github.io/ER-MS365/', '_blank')">
+            <img src="info/er-ms365.png" class="tool-logo">
+            <div class="tool-title">MS-365 Data Uploader</div>
+        </div>
+
+    </div>
+
+    <div style="
+        text-align: center;
+        margin-top: 35px;
+        color: #aaa;
+        font-size: 15px;
+    ">
+        Need support?  
+        <br>
+        <a href="https://wa.me/8801795541326" style="color:#4f8cff;">WhatsApp</a> •
+        <a href="https://www.facebook.com/shahriar.shakil.nobab" style="color:#4f8cff;">Facebook</a> •
+        <a href="https://www.facebook.com/er.mailer.software" style="color:#4f8cff;">Page</a>
+    </div>
 
     <div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
 
@@ -1758,5 +1874,6 @@
 </body>
 
 </html>
+
 
 
