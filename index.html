@@ -6,31 +6,59 @@
   <title>ER Data Checker — Secure Login</title>
 
   <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #6366f1;
+      --secondary: #10b981;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --background: #f9fafb;
+      --white: #ffffff;
+      --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.15);
     }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #6366f1, #4f46e5);
-      height: 100vh;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      margin: 0;
+      padding: 20px;
+      color: var(--text);
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .login-container {
-      background: #fff;
-      width: 400px;
+      background: var(--white);
+      width: 100%;
+      max-width: 420px;
       padding: 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      border-radius: 20px;
+      box-shadow: var(--shadow-lg);
       text-align: center;
       animation: fadeIn 0.6s ease-in-out;
+      margin-bottom: 40px;
     }
 
     @keyframes fadeIn {
@@ -38,74 +66,125 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .login-container h2 {
-      color: #4f46e5;
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-icon {
+      font-size: 2.2rem;
+      color: var(--primary);
+    }
+
+    .logo-text {
       font-size: 1.8rem;
-      margin-bottom: 1rem;
+      font-weight: 700;
+      background: linear-gradient(to right, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .login-container h2 {
+      color: var(--text);
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
     }
 
     .login-container p {
-      color: #555;
-      margin-bottom: 1.5rem;
-      font-size: 0.95rem;
+      color: var(--text-light);
+      margin-bottom: 1.8rem;
+      font-size: 1rem;
+      line-height: 1.5;
     }
 
     .input-group {
       position: relative;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+      font-size: 0.9rem;
     }
 
     .input-group input {
       width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+      padding: 0.9rem 1rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
       font-size: 1rem;
       outline: none;
-      transition: border-color 0.3s;
+      transition: all 0.3s;
+      background: var(--background);
     }
 
     .input-group input:focus {
-      border-color: #4f46e5;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
 
     .btn {
-      background: #4f46e5;
+      background: var(--primary);
       color: white;
       border: none;
       width: 100%;
-      padding: 0.8rem;
-      border-radius: 10px;
+      padding: 0.9rem;
+      border-radius: 12px;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 0.5rem;
     }
 
     .btn:hover {
-      background: #3730a3;
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
     }
 
     .error {
-      color: red;
+      color: #ef4444;
       font-size: 0.9rem;
       margin-top: 0.5rem;
       min-height: 20px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .footer {
-      margin-top: 1.5rem;
+      margin-top: 1.8rem;
       font-size: 0.9rem;
-      color: #666;
+      color: var(--text-light);
     }
 
     .footer a {
-      color: #4f46e5;
+      color: var(--primary);
       text-decoration: none;
       font-weight: 500;
+      transition: color 0.2s;
     }
 
     .footer a:hover {
+      color: var(--primary-dark);
       text-decoration: underline;
     }
 
@@ -113,213 +192,328 @@
       display: none;
       margin-top: 1rem;
       font-size: 0.9rem;
-      color: #4f46e5;
+      color: var(--primary);
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .loading i {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ER Tools Section Styles */
+    .er-tools-section {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .er-tools-header {
+      text-align: center;
+      color: white;
+      font-size: 2rem;
+      margin-bottom: 30px;
+      font-weight: 700;
+      letter-spacing: .5px;
+    }
+
+    .er-tools-box {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+
+    .tool-card {
+      width: 170px;
+      height: 190px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s ease-in-out;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-7px) scale(1.05);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .tool-logo {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      margin-bottom: 12px;
+      transition: .3s;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+    }
+
+    .tool-card:hover .tool-logo {
+      transform: scale(1.12);
+    }
+
+    .tool-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      letter-spacing: .4px;
+      text-align: center;
+      margin-top: 4px;
+      line-height: 1.3;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .login-container {
+        padding: 2rem;
+        max-width: 380px;
+      }
+      
+      .er-tools-header {
+        font-size: 1.7rem;
+      }
+      
+      .tool-card {
+        width: 150px;
+        height: 170px;
+      }
+      
+      .tool-logo {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+      }
+      
+      .login-container {
+        padding: 1.5rem;
+        max-width: 100%;
+      }
+      
+      .logo-text {
+        font-size: 1.5rem;
+      }
+      
+      .er-tools-header {
+        font-size: 1.5rem;
+      }
+      
+      .er-tools-box {
+        gap: 15px;
+      }
+      
+      .tool-card {
+        width: 140px;
+        height: 160px;
+      }
+      
+      .tool-title {
+        font-size: 14px;
+      }
     }
   </style>
-  
 </head>
-    <style>
-        .er-tools-box {
-            margin: 40px auto;
-            width: 100%;
-            max-width: 850px;
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
 
-        .tool-card {
-            width: 170px;
-            height: 190px;
-            background: rgba(255, 255, 255, 0.07);
-            border-radius: 18px;
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s ease-in-out;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-            cursor: pointer;
-        }
+<body>
+  <div class="main-container">
+    <div class="login-container">
+      <div class="logo">
+        <i class="fas fa-shield-alt logo-icon"></i>
+        <div class="logo-text">ER Data Checker</div>
+      </div>
+      
+      <h2>Secure Login</h2>
+      <p>Access your account to validate Mix & Paid data securely</p>
 
-        .tool-card:hover {
-            transform: translateY(-7px) scale(1.05);
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 6px 35px rgba(0,0,0,0.55);
-        }
+      <div class="input-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="Enter your email" required />
+      </div>
 
-        .tool-logo {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin-bottom: 12px;
-            transition: .3s;
-        }
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required />
+      </div>
 
-        .tool-card:hover .tool-logo {
-            transform: scale(1.12);
-        }
+      <button class="btn" id="loginBtn">
+        <i class="fas fa-lock"></i> Login to Dashboard
+      </button>
+      
+      <div id="error-message" class="error"></div>
+      
+      <div id="loading" class="loading">
+        <i class="fas fa-spinner"></i> Logging in, please wait...
+      </div>
 
-        .tool-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: white;
-            letter-spacing: .4px;
-            text-align: center;
-            margin-top: 4px;
-        }
+      <div class="footer">
+        <p>Don't have an account? <a href="#" id="contactAdmin">Contact Administrator</a></p>
+      </div>
+    </div>
 
-        .er-tools-header {
-            text-align: center;
-            color: white;
-            font-size: 26px;
-            margin-top: 35px;
-            font-weight: 700;
-            letter-spacing: .5px;
-        }
-    </style>
+    <!-- ER Tools Section -->
+    <div class="er-tools-section">
+      <h2 class="er-tools-header">ER Official Tools</h2>
 
-    <h2 class="er-tools-header">ER Official Tools</h2>
-
-    <div class="er-tools-box">
-
+      <div class="er-tools-box">
         <!-- ER Mailer -->
         <div class="tool-card"
              onclick="window.open('https://er-mailer.github.io/ER-Mailer---Download-Center/', '_blank')">
-            <img src="info/er-mailer.png" class="tool-logo">
-            <div class="tool-title">Email blasting software</div>
+          <img src="https://via.placeholder.com/70/4f46e5/FFFFFF?text=EM" class="tool-logo" alt="ER Mailer">
+          <div class="tool-title">Email Blasting Software</div>
         </div>
 
         <!-- ER Ghost Scraper -->
         <div class="tool-card"
              onclick="window.open('https://er-mailer.github.io/ER-Ghost-Scraper/', '_blank')">
-            <img src="info/er-ghost.png" class="tool-logo">
-            <div class="tool-title">Data collecting software</div>
+          <img src="https://via.placeholder.com/70/10b981/FFFFFF?text=GS" class="tool-logo" alt="ER Ghost Scraper">
+          <div class="tool-title">Data Collecting Software</div>
         </div>
 
         <!-- ER MS365 Tool -->
         <div class="tool-card"
              onclick="window.open('https://er-mailer.github.io/ER-MS365/', '_blank')">
-            <img src="info/er-ms365.png" class="tool-logo">
-            <div class="tool-title">MS-365 Data Uploader</div>
+          <img src="https://via.placeholder.com/70/ef4444/FFFFFF?text=MS" class="tool-logo" alt="ER MS365">
+          <div class="tool-title">MS-365 Data Uploader</div>
         </div>
         
-         <!-- ER MS365 Tool -->
+        <!-- ER RDP Tool -->
         <div class="tool-card"
             onclick="window.open('https://er-mailer.github.io/RDP/', '_blank')">
-            <img src="info/er-rdp.png" class="tool-logo">
-            <div class="tool-title">Choose Your RDP Provider</div>
+          <img src="https://via.placeholder.com/70/8b5cf6/FFFFFF?text=RDP" class="tool-logo" alt="ER RDP">
+          <div class="tool-title">Choose Your RDP Provider</div>
         </div>
-
-    </div>
-  
-<body>
-  <div class="login-container">
-    <h2>Welcome to ER Data Checker</h2>
-    <p>Login to validate your Mix & Paid data securely.</p>
-
-    <div class="input-group">
-      <input type="email" id="email" placeholder="Enter your email" required />
-    </div>
-
-    <div class="input-group">
-      <input type="password" id="password" placeholder="Enter your password" required />
-    </div>
-
-    <button class="btn" id="loginBtn">Login</button>
-    <div id="error-message" class="error"></div>
-    <div id="loading" class="loading">Logging in, please wait...</div>
-
-    <div class="footer">
-      <p>Don't have an account? <a href="#" id="contactAdmin">Contact Administrator</a></p>
+      </div>
     </div>
   </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCYLIb4UFMDERgc0T4cUHDWK1oTlpsdqMI",
-            authDomain: "er-data-checker.firebaseapp.com",
-            projectId: "er-data-checker",
-            storageBucket: "er-data-checker.firebasestorage.app",
-            messagingSenderId: "288951811041",
-            appId: "1:288951811041:web:13ca2eedc69bcb450cf0a0",
-            measurementId: "G-5XTTX0P0WV"
-        };
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYLIb4UFMDERgc0T4cUHDWK1oTlpsdqMI",
+      authDomain: "er-data-checker.firebaseapp.com",
+      projectId: "er-data-checker",
+      storageBucket: "er-data-checker.firebasestorage.app",
+      messagingSenderId: "288951811041",
+      appId: "1:288951811041:web:13ca2eedc69bcb450cf0a0",
+      measurementId: "G-5XTTX0P0WV"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
 
-        /* ---------------------
-           If already logged in (same tab)
-        ---------------------- */
-        if (sessionStorage.getItem("er_logged_in") === "true") {
-            window.location.replace("er.html");
-        }
+    /* ---------------------
+       If already logged in (same tab)
+    ---------------------- */
+    if (sessionStorage.getItem("er_logged_in") === "true") {
+      window.location.replace("er.html");
+    }
 
-        /* ---------------------
-           Prevent back button login bypass
-        ---------------------- */
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = () => window.history.pushState(null, "", window.location.href);
+    /* ---------------------
+       Prevent back button login bypass
+    ---------------------- */
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = () => window.history.pushState(null, "", window.location.href);
 
-        /* ---------------------
-           Login System
-        ---------------------- */
-        const loginBtn = document.getElementById("loginBtn");
-        const emailInput = document.getElementById("email");
-        const passwordInput = document.getElementById("password");
-        const errorMessage = document.getElementById("error-message");
-        const loadingText = document.getElementById("loading");
+    /* ---------------------
+       Login System
+    ---------------------- */
+    const loginBtn = document.getElementById("loginBtn");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const errorMessage = document.getElementById("error-message");
+    const loadingText = document.getElementById("loading");
 
-        loginBtn.addEventListener("click", async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
+    // Contact Admin Link
+    document.getElementById("contactAdmin").addEventListener("click", function(e) {
+      e.preventDefault();
+      const message = encodeURIComponent("Hello, I would like to request an account for ER Data Checker.");
+      window.open(`https://wa.me/8801795541326?text=${message}`, '_blank');
+    });
 
-            errorMessage.textContent = "";
-            loadingText.style.display = "block";
-            loginBtn.disabled = true;
+    loginBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
 
-            if (!email || !password) {
-                errorMessage.textContent = "Please enter both email and password.";
-                loadingText.style.display = "none";
-                loginBtn.disabled = false;
-                return;
-            }
+      errorMessage.textContent = "";
+      loadingText.style.display = "flex";
+      loginBtn.disabled = true;
 
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
+      if (!email || !password) {
+        errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter both email and password.';
+        loadingText.style.display = "none";
+        loginBtn.disabled = false;
+        return;
+      }
 
-                // SAVE SESSION (browser tab only)
-                sessionStorage.setItem("er_logged_in", "true");
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
 
-                loadingText.textContent = "Login successful! Redirecting...";
-                setTimeout(() => {
-                    window.location.replace("er.html");
-                }, 700);
-            } catch (error) {
-                let msg = "Login failed.";
-                if (error.code === "auth/wrong-password") msg = "Wrong password.";
-                if (error.code === "auth/user-not-found") msg = "User not found.";
-                if (error.code === "auth/invalid-email") msg = "Invalid email.";
-                errorMessage.textContent = msg;
+        // SAVE SESSION (browser tab only)
+        sessionStorage.setItem("er_logged_in", "true");
 
-                loadingText.style.display = "none";
-                loginBtn.disabled = false;
-            }
-        });
-    </script>
+        loadingText.innerHTML = '<i class="fas fa-check-circle"></i> Login successful! Redirecting...';
+        setTimeout(() => {
+          window.location.replace("er.html");
+        }, 1000);
+      } catch (error) {
+        let msg = "Login failed. Please try again.";
+        if (error.code === "auth/wrong-password") msg = "Incorrect password. Please try again.";
+        if (error.code === "auth/user-not-found") msg = "No account found with this email.";
+        if (error.code === "auth/invalid-email") msg = "Please enter a valid email address.";
+        if (error.code === "auth/too-many-requests") msg = "Too many failed attempts. Please try again later.";
+        
+        errorMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${msg}`;
+        loadingText.style.display = "none";
+        loginBtn.disabled = false;
+      }
+    });
 
+    // Allow form submission with Enter key
+    passwordInput.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        loginBtn.click();
+      }
+    });
+
+    // Add animation to tool cards on load
+    document.addEventListener('DOMContentLoaded', function() {
+      const toolCards = document.querySelectorAll('.tool-card');
+      
+      toolCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.1}s`;
+        
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 100);
+      });
+    });
+  </script>
 </body>
 </html>
-
-
-
-
