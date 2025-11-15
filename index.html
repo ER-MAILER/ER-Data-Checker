@@ -405,116 +405,85 @@
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCYLIb4UFMDERgc0T4cUHDWK1oTlpsdqMI",
-      authDomain: "er-data-checker.firebaseapp.com",
-      projectId: "er-data-checker",
-      storageBucket: "er-data-checker.firebasestorage.app",
-      messagingSenderId: "288951811041",
-      appId: "1:288951811041:web:13ca2eedc69bcb450cf0a0",
-      measurementId: "G-5XTTX0P0WV"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYLIb4UFMDERgc0T4cUHDWK1oTlpsdqMI",
+            authDomain: "er-data-checker.firebaseapp.com",
+            projectId: "er-data-checker",
+            storageBucket: "er-data-checker.firebasestorage.app",
+            messagingSenderId: "288951811041",
+            appId: "1:288951811041:web:13ca2eedc69bcb450cf0a0",
+            measurementId: "G-5XTTX0P0WV"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth = getAuth(app);
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
 
-    /* ---------------------
-       If already logged in (same tab)
-    ---------------------- */
-    if (sessionStorage.getItem("er_logged_in") === "true") {
-      window.location.replace("er.html");
-    }
+        /* ---------------------
+           If already logged in (same tab)
+        ---------------------- */
+        if (sessionStorage.getItem("er_logged_in") === "true") {
+            window.location.replace("er.html");
+        }
 
-    /* ---------------------
-       Prevent back button login bypass
-    ---------------------- */
-    window.history.pushState(null, "", window.location.href);
-    window.onpopstate = () => window.history.pushState(null, "", window.location.href);
+        /* ---------------------
+           Prevent back button login bypass
+        ---------------------- */
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = () => window.history.pushState(null, "", window.location.href);
 
-    /* ---------------------
-       Login System
-    ---------------------- */
-    const loginBtn = document.getElementById("loginBtn");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const errorMessage = document.getElementById("error-message");
-    const loadingText = document.getElementById("loading");
+        /* ---------------------
+           Login System
+        ---------------------- */
+        const loginBtn = document.getElementById("loginBtn");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const errorMessage = document.getElementById("error-message");
+        const loadingText = document.getElementById("loading");
 
-    // Contact Admin Link
-    document.getElementById("contactAdmin").addEventListener("click", function(e) {
-      e.preventDefault();
-      const message = encodeURIComponent("Hello, I would like to request an account for ER Data Checker.");
-      window.open(`https://wa.me/8801795541326?text=${message}`, '_blank');
-    });
+        loginBtn.addEventListener("click", async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
 
-    loginBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
+            errorMessage.textContent = "";
+            loadingText.style.display = "block";
+            loginBtn.disabled = true;
 
-      errorMessage.textContent = "";
-      loadingText.style.display = "flex";
-      loginBtn.disabled = true;
+            if (!email || !password) {
+                errorMessage.textContent = "Please enter both email and password.";
+                loadingText.style.display = "none";
+                loginBtn.disabled = false;
+                return;
+            }
 
-      if (!email || !password) {
-        errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please enter both email and password.';
-        loadingText.style.display = "none";
-        loginBtn.disabled = false;
-        return;
-      }
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
 
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
+                // SAVE SESSION (browser tab only)
+                sessionStorage.setItem("er_logged_in", "true");
 
-        // SAVE SESSION (browser tab only)
-        sessionStorage.setItem("er_logged_in", "true");
+                loadingText.textContent = "Login successful! Redirecting...";
+                setTimeout(() => {
+                    window.location.replace("er.html");
+                }, 700);
+            } catch (error) {
+                let msg = "Login failed.";
+                if (error.code === "auth/wrong-password") msg = "Wrong password.";
+                if (error.code === "auth/user-not-found") msg = "User not found.";
+                if (error.code === "auth/invalid-email") msg = "Invalid email.";
+                errorMessage.textContent = msg;
 
-        loadingText.innerHTML = '<i class="fas fa-check-circle"></i> Login successful! Redirecting...';
-        setTimeout(() => {
-          window.location.replace("er.html");
-        }, 1000);
-      } catch (error) {
-        let msg = "Login failed. Please try again.";
-        if (error.code === "auth/wrong-password") msg = "Incorrect password. Please try again.";
-        if (error.code === "auth/user-not-found") msg = "No account found with this email.";
-        if (error.code === "auth/invalid-email") msg = "Please enter a valid email address.";
-        if (error.code === "auth/too-many-requests") msg = "Too many failed attempts. Please try again later.";
-        
-        errorMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${msg}`;
-        loadingText.style.display = "none";
-        loginBtn.disabled = false;
-      }
-    });
-
-    // Allow form submission with Enter key
-    passwordInput.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        loginBtn.click();
-      }
-    });
-
-    // Add animation to tool cards on load
-    document.addEventListener('DOMContentLoaded', function() {
-      const toolCards = document.querySelectorAll('.tool-card');
-      
-      toolCards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.1}s`;
-        
-        setTimeout(() => {
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        }, 100);
-      });
-    });
-  </script>
+                loadingText.style.display = "none";
+                loginBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>
+
 
