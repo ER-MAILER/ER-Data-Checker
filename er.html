@@ -1371,8 +1371,8 @@
                         return;
                     }
         
-                    if (mailLines.length > 50000) {
-                        showNotification('error', 'Please do not exceed 50,000 emails at a time!');
+                    if (mailLines.length > 20000) {
+                        showNotification('error', 'Please do not exceed 20,000 emails at a time!');
                         toggleLoading(false);
                         return;
                     }
@@ -1762,6 +1762,7 @@
     </script>
 </body>
 </html>
+
 
 
 
