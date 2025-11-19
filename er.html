@@ -6,7 +6,7 @@
     <title>ER Data Checker — Mix & Paid Data Validator</title>
     <!-- CSS -->
     <link rel="stylesheet" href="./info/codemirror.css">
-    <!-- 替换原来的Font Awesome链接 -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -17,8 +17,10 @@
             --primary: #6366f1;
             --primary-dark: #4f46e5;
             --secondary: #10b981;
-            --dark: #1e293b;
-            --darker: #0f172a;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --darker: #0a0f1c;
             --light: #f8fafc;
             --gray: #94a3b8;
             --glass: rgba(255, 255, 255, 0.08);
@@ -34,116 +36,25 @@
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #0f172a;
+            background-color: var(--dark);
             color: var(--light);
             line-height: 1.6;
-            background-image: 
-                linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23101a2e"/><path d="M0 0L100 100M100 0L0 100" stroke="%231e293b" stroke-width="1"/></svg>');
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
         }
         
-        body::before {
-            content: '';
+        .background-pattern {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
             z-index: -1;
-        }
-        
-        .language-switcher {
-            position: relative;
-            margin-left: 1rem;
-        }
-        
-        .language-switcher-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .language-switcher-btn:hover {
-            background: var(--glass-highlight);
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .result {
-            margin-top: 1.5rem;
-        }
-        
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .badge-success {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #10b981;
-        }
-        
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #ef4444;
-        }
-        
-        .bg-brand-pinterest {
-            background: rgba(220, 38, 38, 0.2);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            color: #dc2626;
-        }
-        
-        .bg-translucent-dark {
-            background: rgba(30, 41, 59, 0.4);
-            border: 1px solid rgba(30, 41, 59, 0.5);
-            color: var(--gray);
-        }
-        
-        .bg-dark-dark {
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(15, 23, 42, 0.5);
-            color: var(--gray);
-        }
-        
-        .hand-cursor {
-            cursor: pointer;
-        }
-        
-        .hand-cursor:hover {
-            transform: translateY(-2px);
-        }
-        
-        .text-sm {
-            font-size: 0.85rem;
-        }
-        
-        .mg-bottom-5 {
-            margin-bottom: 1.25rem;
+            opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--primary) 0%, transparent 55%),
+                radial-gradient(circle at 75% 75%, var(--secondary) 0%, transparent 55%);
         }
         
         .preloader {
@@ -172,137 +83,205 @@
             to { transform: rotate(360deg); }
         }
         
-        .navbar {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        /* Header */
+        .header {
+            background: var(--darker);
             border-bottom: 1px solid var(--glass-border);
             padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
-        .container {
+        .header-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
-        .navbar-brand {
+        .logo-section {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            font-weight: 600;
+            gap: 1rem;
+        }
+        
+        .logo {
+            height: 50px;
+            border-radius: 10px;
+        }
+        
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.25rem;
             color: var(--light);
-            text-decoration: none;
         }
         
-        .navbar-brand img {
-            height: 32px;
+        .language-switcher {
+            position: relative;
         }
         
-        .navbar-nav {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            list-style: none;
-        }
-        
-        .nav-link {
-            color: var(--gray);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
+        .language-switcher-btn {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
-        .nav-link:hover {
+        .language-switcher-btn:hover {
+            background: var(--glass-highlight);
+        }
+        
+        .language-switcher-btn img {
+            width: 20px;
+            height: 15px;
+            border-radius: 2px;
+        }
+        
+        .language-dropdown {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 0.5rem;
+            background: var(--darker);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            min-width: 160px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        .language-switcher:hover .language-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .language-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .language-dropdown a:hover {
+            background: var(--glass-highlight);
             color: var(--light);
         }
         
-        .nav-link svg {
-            width: 18px;
-            height: 18px;
+        .language-dropdown a img {
+            width: 20px;
+            height: 15px;
+            border-radius: 2px;
         }
         
-        .card {
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        /* Page Title */
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--light);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-card {
             background: var(--glass);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
             transition: transform 0.2s, box-shadow 0.2s;
         }
         
-        .card:hover {
-            transform: translateY(-2px);
+        .dashboard-card:hover {
+            transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
         
-        .media {
+        .card-header {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            justify-content: space-between;
+            margin-bottom: 1rem;
         }
         
-        .avatar {
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        .card-icon {
             width: 40px;
             height: 40px;
-            border-radius: 50%;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            flex-shrink: 0;
         }
         
-        .avatar svg {
-            width: 20px;
-            height: 20px;
+        .card-icon i {
+            color: white;
+            font-size: 1.2rem;
         }
         
-        .media-body h5 {
-            font-size: 1.1rem;
-            margin-bottom: 0.25rem;
+        .card-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 0.5rem;
         }
         
-        .text-muted {
+        .card-description {
+            font-size: 0.85rem;
             color: var(--gray);
-            font-size: 0.9rem;
         }
         
-        .nav-tabs {
+        /* Tabs */
+        .tabs-container {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             overflow-x: auto;
             padding-bottom: 0.5rem;
         }
         
-        .nav-tabs::-webkit-scrollbar {
-            height: 4px;
-        }
-        
-        .nav-tabs::-webkit-scrollbar-track {
-            background: var(--glass);
-        }
-        
-        .nav-tabs::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 2px;
-        }
-        
-        .nav-item {
-            flex-shrink: 0;
-        }
-        
-        .nav-link-tab {
+        .tab {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1rem;
+            padding: 0.75rem 1.5rem;
             border-radius: 8px;
             background: var(--glass);
             border: 1px solid var(--glass-border);
@@ -310,52 +289,61 @@
             text-decoration: none;
             font-weight: 500;
             transition: all 0.2s;
+            white-space: nowrap;
+            cursor: pointer;
         }
         
-        .nav-link-tab.active {
-            background: rgba(99, 102, 241, 0.2);
-            border: 1px solid #6366f1;
-            color: #6366f1;
-        }
-        
-        .nav-link-tab:hover:not(.active) {
+        .tab:hover {
             background: var(--glass-highlight);
         }
         
-        .nav-link-tab svg {
-            width: 18px;
-            height: 18px;
+        .tab.active {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
         }
         
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -0.75rem;
+        .tab i {
+            font-size: 1rem;
         }
         
-        .col-md-6 {
-            width: 50%;
-            padding: 0 0.75rem;
+        /* Content Area */
+        .content-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
         
-        @media (max-width: 768px) {
-            .col-md-6 {
-                width: 100%;
+        @media (max-width: 1024px) {
+            .content-area {
+                grid-template-columns: 1fr;
             }
         }
         
-        .form-group {
-            margin-bottom: 1.5rem;
+        .content-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         
-        .form-heading {
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-heading {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
         
-        .form-control-label {
+        .card-label {
             font-weight: 600;
             color: var(--light);
         }
@@ -386,16 +374,16 @@
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(var(--primary), 0.3);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
         }
         
-        .btn-info {
+        .btn-secondary {
             background: var(--glass);
             border: 1px solid var(--glass-border);
             color: var(--light);
         }
         
-        .btn-info:hover {
+        .btn-secondary:hover {
             background: var(--glass-highlight);
         }
         
@@ -405,9 +393,8 @@
             gap: 0.5rem;
         }
         
-        .btn-inner--icon svg {
-            width: 16px;
-            height: 16px;
+        .btn-inner--icon i {
+            font-size: 0.9rem;
         }
         
         .form-control {
@@ -436,7 +423,7 @@
             background: var(--glass);
             border-radius: 4px;
             overflow: hidden;
-            margin-bottom: 1.5rem;
+            margin: 1.5rem 0;
         }
         
         .progress-bar {
@@ -446,6 +433,262 @@
             transition: width 0.3s ease;
             position: relative;
             overflow: hidden;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .action-buttons .btn {
+            flex: 1;
+        }
+        
+        /* Results Section */
+        .results-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 1.5rem;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .result-item {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background: var(--glass);
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.2s;
+        }
+        
+        .result-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .result-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-value {
+            font-weight: 600;
+            color: var(--light);
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .result-action {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.75rem;
+            margin-top: auto;
+        }
+        
+        .result-action:hover {
+            background: rgba(99, 102, 241, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* Tools Section */
+        .tools-section {
+            margin-bottom: 2rem;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .tool-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .tool-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            transition: transform 0.3s;
+        }
+        
+        .tool-card:hover .tool-logo {
+            transform: scale(1.1);
+        }
+        
+        .tool-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--light);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--darker);
+            color: var(--gray);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .footer-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--light);
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-description {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .footer-link {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .footer-link:hover {
+            color: var(--light);
+        }
+        
+        .footer-copyright {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .logo-section {
+                justify-content: center;
+            }
+            
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs-container {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                min-width: 140px;
+                justify-content: center;
+            }
+            
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        /* CodeMirror Customization */
+        .CodeMirror {
+            height: 300px;
+            background: var(--glass);
+            color: var(--light);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0;
+        }
+
+        .CodeMirror-gutters {
+            background: rgba(30, 41, 59, 0.4);
+            border-right: 1px solid var(--glass-border);
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .CodeMirror-linenumber {
+            color: var(--gray);
+        }
+
+        .CodeMirror-cursor {
+            border-left: 2px solid var(--primary) !important;
+        }
+        
+        .CodeMirror-selected {
+            background: rgba(99, 102, 241, 0.3);
         }
         
         /* Web3 Notification Styles */
@@ -484,11 +727,11 @@
         }
         
         .web3-notification-error::before {
-            background: #ef4444;
+            background: var(--danger);
         }
         
         .web3-notification-warning::before {
-            background: #f59e0b;
+            background: var(--accent);
         }
         
         .web3-notification-info::before {
@@ -513,11 +756,11 @@
         }
         
         .web3-notification-error .web3-notification-icon {
-            color: #ef4444;
+            color: var(--danger);
         }
         
         .web3-notification-warning .web3-notification-icon {
-            color: #f59e0b;
+            color: var(--accent);
         }
         
         .web3-notification-info .web3-notification-icon {
@@ -570,274 +813,17 @@
         }
         
         .web3-notification-error .web3-notification-progress::after {
-            background: #ef4444;
+            background: var(--danger);
         }
         
         .web3-notification-warning .web3-notification-progress::after {
-            background: #f59e0b;
+            background: var(--accent);
         }
         
         .web3-notification-info .web3-notification-progress::after {
             background: var(--primary);
         }
-        
-        /* 主编辑器容器 */
-        .CodeMirror {
-            height: 300px;
-            background: var(--glass);
-            color: var(--light);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 0;
-        }
-
-        /* 内容区域（补偿移除的 padding） */
-        .CodeMirror-code {
-            padding: 0.5rem 0;
-        }
-
-        /* 行号栏调整 */
-        .CodeMirror-gutters {
-            background: rgba(30, 41, 59, 0.4);
-            border-right: 1px solid var(--glass-border);
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-            height: 100% !important;
-        }
-
-        /* 行号文字微调 */
-        .CodeMirror-linenumber {
-            color: var(--gray);
-            padding: 0 0.5rem 0 0.25rem;
-        }
-
-        /* 光标和选中文本 */
-        .CodeMirror-cursor {
-            border-left: 2px solid var(--primary) !important;
-            margin-left: 0.5rem;
-        }
-        .CodeMirror-selected {
-            background: rgba(99, 102, 241, 0.3);
-            margin-left: 0.5rem;
-        }
-
-        /* 滚动条完全自定义（如需） */
-        .CodeMirror-scroll {
-            scrollbar-width: thin;
-            scrollbar-color: var(--primary) transparent;
-        }
-        
-        .language-switcher-btn img {
-            width: 20px;
-            height: 15px;
-            border-radius: 2px;
-        }
-        
-        .language-dropdown {
-            position: absolute;
-            right: 0;
-            top: 100%;
-            margin-top: 0.5rem;
-            background: var(--dark);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            min-width: 160px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(10px);
-            transition: all 0.2s;
-            z-index: 10;
-        }
-        
-        .language-switcher:hover .language-dropdown {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        
-        .language-dropdown a {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: var(--gray);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        
-        .language-dropdown a:hover {
-            background: var(--glass-highlight);
-            color: var(--light);
-        }
-        
-        .navbar {
-            position: relative;
-            z-index: 1000;
-        }
-        
-        .card {
-            z-index: 1;
-        }
-        
-        .language-dropdown a img {
-            width: 20px;
-            height: 15px;
-            border-radius: 2px;
-        }
-        
-        .progress {
-            height: 20px;
-            background: var(--glass);
-            border-radius: 4px;
-            overflow: visible;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            line-height: 20px;
-            font-size: 12px;
-            text-align: center;
-            color: white;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border-radius: 4px;
-            position: relative;
-            overflow: visible;
-        }
-        
-        /* 响应式调整 */
-        @media (max-width: 768px) {
-            .navbar-nav {
-                gap: 1rem;
-            }
-            
-            .language-switcher {
-                margin-left: 0.5rem;
-            }
-            
-            .nav-link-tab {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.85rem;
-            }
-            
-            .web3-notification {
-                width: calc(100% - 40px);
-                max-width: 300px;
-            }
-        }
-        
-        /* 动画效果 */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .animate-fadeIn {
-            animation: fadeIn 0.5s ease-out;
-        }
-        
-        /* 联系信息样式 */
-        .contact-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--glass-border);
-        }
-        
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            color: var(--gray);
-        }
-        
-        .contact-item a {
-            color: var(--primary);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        
-        .contact-item a:hover {
-            color: var(--light);
-        }
-        
-        /* 按钮位置调整 */
-        .action-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .action-buttons .btn {
-            flex: 1;
-        }
-        
-        /* 结果统计区域调整 */
-        .result-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            background: var(--glass);
-            border-radius: 8px;
-            border: 1px solid var(--glass-border);
-        }
-        
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--gray);
-        }
-        
-        .stat-value {
-            font-weight: 600;
-            color: var(--light);
-        }
-        
-        .stat-download {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.25rem 0.5rem;
-            background: rgba(99, 102, 241, 0.2);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.75rem;
-        }
-        
-        .stat-download:hover {
-            background: rgba(99, 102, 241, 0.3);
-            transform: translateY(-1px);
-        }
-        
-        /* 新的背景图案 */
-        .background-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.1;
-            background-image: 
-                radial-gradient(circle at 25% 25%, #6366f1 0%, transparent 55%),
-                radial-gradient(circle at 75% 75%, #10b981 0%, transparent 55%);
-        }
     </style>
-    <!-- 引入Inter字体 -->
-    <!-- 引入Font Awesome图标 -->
-    <link rel="stylesheet" href="./info/all.min.css">
 </head>
 <body>
     <div class="background-pattern"></div>
@@ -845,334 +831,233 @@
         <div class="spinner"></div>
     </div>
 
-    <nav class="navbar" style="padding: 10px 0; background: #111827;">
-        <div class="container">
-            <div style="display: flex; justify-content: center; align-items: center; width: 100%; position: relative;">
-
-                <!-- Left Logo -->
-                <a class="navbar-brand" 
-                   href="https://whatsapp.com/channel/0029Vb71GGL9xVJaPPIRGi25" 
-                   style="display: flex; align-items: center; gap: 12px; position: absolute; left: 0;">
-                    
-                    <img src="info/er-logo.png" 
-                         alt="ER Checker" 
-                         width="60" height="60"
-                         style="border-radius: 12px;">
-
-                </a>
-
-                <!-- Center Title -->
-                <span style="
-                    font-weight: 700; 
-                    font-size: 20px; 
-                    color: white; 
-                    text-align: center;
-                    letter-spacing: 0.5px;
-                ">
-                    ER Data Checker — Mix & Paid Data Validator
-                </span>
-
-                <!-- Right Language Switcher -->
-                <div style="display: flex; align-items: center; position: absolute; right: 0;">
-                    
-                    <div class="language-switcher">
-                        <div class="language-switcher-btn">
-                            <img id="current-language-flag" src="https://flagcdn.com/w20/gb.png" alt="English">
-                            <span id="current-language-name">English</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-
-                        <div class="language-dropdown" style="z-index:10000">
-                            <a href="#" onclick="changeLanguage('en', 'English')">
-                                <img src="https://flagcdn.com/w20/gb.png" alt="English"> English
-                            </a>
-                            <a href="#" onclick="changeLanguage('zh', '中文')">
-                                <img src="https://flagcdn.com/w20/cn.png" alt="中文"> 中文
-                            </a>
-                            <a href="#" onclick="changeLanguage('bn', 'বাংলা')">
-                                <img src="https://flagcdn.com/w20/bd.png" alt="বাংলা"> বাংলা
-                            </a>
-                            <a href="#" onclick="changeLanguage('ar', 'العربية')">
-                                <img src="https://flagcdn.com/w20/eg.png" alt="العربية"> العربية
-                            </a>
-                            <a href="#" onclick="changeLanguage('hi', 'हिन्दी')">
-                                <img src="https://flagcdn.com/w20/in.png" alt="हिन्दी"> हिन्दी
-                            </a>
-                        </div>
-                    </div>
-
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="info/er-logo.png" alt="ER Checker" class="logo">
+                <span class="logo-text">ER Data Checker</span>
+            </div>
+            
+            <div class="language-switcher">
+                <div class="language-switcher-btn">
+                    <img id="current-language-flag" src="https://flagcdn.com/w20/gb.png" alt="English">
+                    <span id="current-language-name">English</span>
+                    <i class="fas fa-chevron-down"></i>
                 </div>
-
+                
+                <div class="language-dropdown">
+                    <a href="#" onclick="changeLanguage('en', 'English')">
+                        <img src="https://flagcdn.com/w20/gb.png" alt="English"> English
+                    </a>
+                    <a href="#" onclick="changeLanguage('zh', '中文')">
+                        <img src="https://flagcdn.com/w20/cn.png" alt="中文"> 中文
+                    </a>
+                    <a href="#" onclick="changeLanguage('bn', 'বাংলা')">
+                        <img src="https://flagcdn.com/w20/bd.png" alt="বাংলা"> বাংলা
+                    </a>
+                    <a href="#" onclick="changeLanguage('ar', 'العربية')">
+                        <img src="https://flagcdn.com/w20/eg.png" alt="العربية"> العربية
+                    </a>
+                    <a href="#" onclick="changeLanguage('hi', 'हिन्दी')">
+                        <img src="https://flagcdn.com/w20/in.png" alt="हिन्दी"> हिन्दी
+                    </a>
+                </div>
             </div>
         </div>
-    </nav>
+    </header>
 
-
-    <style>
-        .er-tools-box {
-            margin: 40px auto;
-            width: 100%;
-            max-width: 850px;
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
-
-        .tool-card {
-            width: 170px;
-            height: 190px;
-            background: rgba(255, 255, 255, 0.07);
-            border-radius: 18px;
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: 0.3s ease-in-out;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-            cursor: pointer;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-7px) scale(1.05);
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 6px 35px rgba(0,0,0,0.55);
-        }
-
-        .tool-logo {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin-bottom: 12px;
-            transition: .3s;
-        }
-
-        .tool-card:hover .tool-logo {
-            transform: scale(1.12);
-        }
-
-        .tool-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: white;
-            letter-spacing: .4px;
-            text-align: center;
-            margin-top: 4px;
-        }
-
-        .er-tools-header {
-            text-align: center;
-            color: white;
-            font-size: 26px;
-            margin-top: 35px;
-            font-weight: 700;
-            letter-spacing: .5px;
-        }
-    </style>
-
-    <h2 class="er-tools-header">ER Official Tools</h2>
-
-    <div class="er-tools-box">
-
-        <!-- ER Mailer -->
-        <div class="tool-card"
-             onclick="window.open('https://er-mailer.github.io/ER-Mailer---Download-Center/', '_blank')">
-            <img src="info/er-mailer.png" class="tool-logo">
-            <div class="tool-title">Email blasting software</div>
-        </div>
-
-        <!-- ER Ghost Scraper -->
-        <div class="tool-card"
-             onclick="window.open('https://er-mailer.github.io/ER-Ghost-Scraper/', '_blank')">
-            <img src="info/er-ghost.png" class="tool-logo">
-            <div class="tool-title">Data collecting software</div>
-        </div>
-
-        <!-- ER MS365 Tool -->
-        <div class="tool-card"
-             onclick="window.open('https://er-mailer.github.io/ER-MS365/', '_blank')">
-            <img src="info/er-ms365.png" class="tool-logo">
-            <div class="tool-title">MS-365 Data Uploader</div>
+    <!-- Main Content -->
+    <main class="main-container">
+        <h1 class="page-title">Mix & Paid Data Validator</h1>
+        
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">Total Emails</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+                <div class="card-value" id="total-emails">0</div>
+                <p class="card-description">Emails to validate</p>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">Valid Emails</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="card-value" id="valid-emails">0</div>
+                <p class="card-description">Verified emails</p>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">Invalid Emails</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                </div>
+                <div class="card-value" id="invalid-emails">0</div>
+                <p class="card-description">Invalid or disabled</p>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">Processing Speed</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                </div>
+                <div class="card-value" id="processing-speed">200/s</div>
+                <p class="card-description">Current mode</p>
+            </div>
         </div>
         
-         <!-- ER MS365 Tool -->
-        <div class="tool-card"
-            onclick="window.open('https://er-mailer.github.io/RDP/', '_blank')">
-            <img src="info/er-rdp.png" class="tool-logo">
-            <div class="tool-title">Choose Your RDP Provider</div>
-        </div>
-
-    </div>
-
-    <div style="
-        text-align: center;
-        margin-top: 35px;
-        color: #aaa;
-        font-size: 15px;
-    ">
-        Need support?  
-        <br>
-        <a href="https://wa.me/8801795541326" style="color:#4f8cff;">WhatsApp</a> •
-        <a href="https://www.facebook.com/shahriar.shakil.nobab" style="color:#4f8cff;">Facebook</a> •
-        <a href="https://www.facebook.com/er.mailer.software" style="color:#4f8cff;">Page</a>
-    </div>
-
-    <div class="container" style="padding-top: 2rem; padding-bottom: 2rem;">
-
-        <div class="nav-tabs">
-            <div class="nav-item" id="nav-item1">
-                <a class="nav-link-tab active">
-                    <svg t="1733635514988" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-                        <path d="M528.596194 163.527916V7.005082h492.529772v156.591835H528.596194v-0.069001m0 0zM528.596194 402.289714V245.696879h492.529772v156.592835H528.596194m0 0zM528.596194 776.5271V620.068266h492.529772v156.522835H528.596194v-0.064001m0 0zM528.596194 1015.287898V858.763064h492.529772v156.523834H528.596194v0.001m0 0zM395.297632 403.64773H2.52503V10.874127h392.774602l-0.002 392.773603m0 0zM395.297632 1014.197885H2.52503V621.357282h392.774602l-0.002 392.840603m0 0z" fill="currentColor"></path>
-                        <path d="M530.336215 163.527916V7.005082h492.528772v156.591835H530.336215v-0.069001m0 0zM530.336215 402.289714V245.696879h492.528772v156.592835H530.336215m0 0zM530.336215 776.5271V620.068266h492.528772v156.522835H530.336215v-0.064001m0 0zM530.336215 1015.287898V858.763064h492.528772v156.523834H530.336215v0.001m0 0zM397.037653 403.64773H4.26405V10.874127h392.773603v392.773603m0 0zM397.037653 1014.197885H4.26405V621.357282h392.773603v392.840603m0 0z" fill="currentColor"></path>
-                    </svg>
-                    <span data-i18n="mode.precision">Sense Core(200/s)</span>
-                </a>
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tab active" id="tab1" onclick="switchTab(1)">
+                <i class="fas fa-bolt"></i>
+                <span data-i18n="mode.precision">Sense Core(200/s)</span>
             </div>
-            <div class="nav-item" id="nav-item2">
-                <a class="nav-link-tab">
-                    <svg t="1733635578874" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-                        <path d="M614.4 838.4h-204.8c-29.866667 0-55.466667 25.6-55.466667 55.466667 0 29.866667 25.6 55.466667 55.466667 55.466666h204.8c29.866667 0 55.466667-25.6 55.466667-55.466666 0-29.866667-25.6-55.466667-55.466667-55.466667z m354.133333-251.733333h-204.8c-29.866667 0-55.466667 25.6-55.466666 55.466666 0 29.866667 25.6 55.466667 55.466666 55.466667h204.8c29.866667 0 55.466667-25.6 55.466667-55.466667 0-29.866667-23.466667-55.466667-55.466667-55.466666z m-354.133333 0h-204.8c-29.866667 0-55.466667 25.6-55.466667 55.466666 0 29.866667 25.6 55.466667 55.466667 55.466667h204.8c29.866667 0 55.466667-25.6 55.466667-55.466667 0-29.866667-25.6-55.466667-55.466667-55.466666z m-354.133333 0H55.466667c-29.866667 0-55.466667 25.6-55.466667 55.466666 0 29.866667 25.6 55.466667 55.466667 55.466667h204.8c29.866667 0 55.466667-25.6 55.466666-55.466667 0-29.866667-25.6-55.466667-55.466666-55.466666z m708.266666-251.733334h-204.8c-29.866667 0-55.466667 25.6-55.466666 55.466667 0 29.866667 25.6 55.466667 55.466666 55.466667h204.8c29.866667 0 55.466667-25.6 55.466667-55.466667 0-32-23.466667-55.466667-55.466667-55.466667z m-354.133333 0h-204.8c-29.866667 0-55.466667 25.6-55.466667 55.466667 0 29.866667 25.6 55.466667 55.466667 55.466667h204.8c29.866667 0 55.466667-25.6 55.466667-55.466667 0-32-25.6-55.466667-55.466667-55.466667z m-354.133333 0H55.466667c-29.866667 0-55.466667 25.6-55.466667 55.466667 0 29.866667 25.6 55.466667 55.466667 55.466667h204.8c29.866667 0 55.466667-25.6 55.466666-55.466667 0-32-25.6-55.466667-55.466666-55.466667z m503.466666-140.8h204.8C1000.533333 192 1024 168.533333 1024 138.666667c0-29.866667-25.6-55.466667-55.466667-55.466667h-204.8c-29.866667 0-55.466667 25.6-55.466666 55.466667 0 29.866667 25.6 55.466667 55.466666 55.466666z m-149.333333-110.933333h-204.8c-29.866667 0-55.466667 25.6-55.466667 55.466667 0 29.866667 25.6 55.466667 55.466667 55.466666h204.8c29.866667 0 55.466667-25.6 55.466667-55.466666 0-32-25.6-55.466667-55.466667-55.466667z m-354.133333 0H55.466667C25.6 83.2 0 108.8 0 138.666667c0 29.866667 25.6 55.466667 55.466667 55.466666h204.8c29.866667 0 55.466667-25.6 55.466666-55.466666 0-32-25.6-55.466667-55.466666-55.466667z" fill="currentColor"></path>
-                    </svg>
-                    <span data-i18n="mode.detailed">This function is currently being updated. Please try the others.</span>
-                </a>
+            <div class="tab" id="tab2" onclick="switchTab(2)">
+                <i class="fas fa-cog"></i>
+                <span data-i18n="mode.detailed">This function is currently being updated. Please try the others.</span>
             </div>
-            <div class="nav-item" id="nav-item3">
-                <a class="nav-link-tab">
-                    <svg t="1733635622782" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
-                        <path d="M771.3 465.8L256 1024l150.1-450.3c1.7-5.2-2.1-10.5-7.6-10.5H253c-46.5 0-77.5-48.1-58.3-90.5L392.5 37.5C402.9 14.7 425.7 0 450.8 0h419.6L672.5 346.4c-3 5.3 0.8 12 6.9 12h44.8c55.8 0 84.9 66.4 47.1 107.4z" fill="currentColor"></path>
-                    </svg>
-                    <span data-i18n="mode.fast">fast mode(10000/s)</span>
-                </a>
+            <div class="tab" id="tab3" onclick="switchTab(3)">
+                <i class="fas fa-tachometer-alt"></i>
+                <span data-i18n="mode.fast">fast mode(1000/s)</span>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <div class="form-heading">
-                        <label class="form-control-label" data-i18n="input.label">Mail Input</label>
-                        <button id="clear-input" type="button" class="btn btn-info btn-xs btn-icon-label">
-                            <span class="btn-inner--icon">
-                                <i class="fas fa-trash-alt"></i>
-                            </span>
-                            <span class="btn-inner--text" data-i18n="input.clear">Clear Input</span>
-                        </button>
-                    </div>
-                    <!-- 替换原来的 textarea -->
-                    <div class="code-container">
-                        <textarea id="mail-input" placeholder="Enter emails here, one per line"></textarea>
-                    </div>
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="content-card">
+                <div class="card-heading">
+                    <label class="card-label" data-i18n="input.label">Mail Input</label>
+                    <button id="clear-input" type="button" class="btn btn-secondary btn-xs btn-icon-label">
+                        <span class="btn-inner--icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </span>
+                        <span class="btn-inner--text" data-i18n="input.clear">Clear Input</span>
+                    </button>
                 </div>
+                
+                <div class="code-container">
+                    <textarea id="mail-input" class="form-control" placeholder="Enter emails here, one per line"></textarea>
+                </div>
+                
                 <div class="progress">
-                    <div id="mail-progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div id="mail-progress-bar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
                 </div>
+                
                 <div class="action-buttons">
                     <button type="button" id="check-btn" class="btn btn-primary">
                         <i class="fas fa-search"></i>
                         <span data-i18n="button.check">Check Emails</span>
                     </button>
-                    <button type="button" id="clear-all" class="btn btn-info">
+                    <button type="button" id="clear-all" class="btn btn-secondary">
                         <i class="fas fa-broom"></i>
                         <span>Clear All</span>
                     </button>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                    <div class="form-heading">
-                        <label class="form-control-label" data-i18n="output.label">Mail Output</label>
-                        <button id="clear-output" type="button" class="btn btn-info btn-xs btn-icon-label">
-                            <span class="btn-inner--icon">
-                                <i class="fas fa-trash-alt"></i>
-                            </span>
-                            <span class="btn-inner--text" data-i18n="output.clear">Clear Output</span>
-                        </button>
-                    </div>
-                    <textarea id="mail-output" class="form-control" rows="15" readonly></textarea>
+            
+            <div class="content-card">
+                <div class="card-heading">
+                    <label class="card-label" data-i18n="output.label">Mail Output</label>
+                    <button id="clear-output" type="button" class="btn btn-secondary btn-xs btn-icon-label">
+                        <span class="btn-inner--icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </span>
+                        <span class="btn-inner--text" data-i18n="output.clear">Clear Output</span>
+                    </button>
                 </div>
                 
-                <div class="result-stats">
-                    <div class="stat-item">
-                        <span class="stat-label" data-i18n="result.good">Good:</span>
-                        <div class="stat-value" id="rp-good">0</div>
-                        <div class="stat-download" onclick="downloadFile('live')">
-                            <i class="fas fa-download"></i>
-                            <span data-i18n="result.download">Download</span>
-                        </div>
+                <textarea id="mail-output" class="form-control" rows="15" readonly></textarea>
+            </div>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="results-section">
+            <h2 class="section-title">Validation Results</h2>
+            
+            <div class="results-grid">
+                <div class="result-item">
+                    <span class="result-label" data-i18n="result.good">Good:</span>
+                    <div class="result-value" id="rp-good">0</div>
+                    <div class="result-action" onclick="downloadFile('live')">
+                        <i class="fas fa-download"></i>
+                        <span data-i18n="result.download">Download</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label" data-i18n="result.verified">Verified:</span>
-                        <div class="stat-value" id="rp-ver">0</div>
-                        <div class="stat-download" onclick="downloadFile('Verify')">
-                            <i class="fas fa-download"></i>
-                            <span data-i18n="result.download">Download</span>
-                        </div>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label" data-i18n="result.disabled">Disabled:</span>
+                    <div class="result-value" id="rp-disabled">0</div>
+                    <div class="result-action" onclick="downloadFile('Disabled')">
+                        <i class="fas fa-download"></i>
+                        <span data-i18n="result.download">Download</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label" data-i18n="result.disabled">Disabled:</span>
-                        <div class="stat-value" id="rp-disabled">0</div>
-                        <div class="stat-download" onclick="downloadFile('Disabled')">
-                            <i class="fas fa-download"></i>
-                            <span data-i18n="result.download">Download</span>
-                        </div>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label" data-i18n="result.not_exist">Not Exist:</span>
+                    <div class="result-value" id="rp-not-exist">0</div>
+                    <div class="result-action" onclick="downloadFile('Error')">
+                        <i class="fas fa-download"></i>
+                        <span data-i18n="result.download">Download</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label" data-i18n="result.not_exist">Not Exist:</span>
-                        <div class="stat-value" id="rp-not-exist">0</div>
-                        <div class="stat-download" onclick="downloadFile('Error')">
-                            <i class="fas fa-download"></i>
-                            <span data-i18n="result.download">Download</span>
-                        </div>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label" data-i18n="result.unknown">Unknown:</span>
+                    <div class="result-value" id="rp-unknown">0</div>
+                    <div class="result-action" onclick="downloadFile('Unregistered')">
+                        <i class="fas fa-download"></i>
+                        <span data-i18n="result.download">Download</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label" data-i18n="result.unknown">Unknown:</span>
-                        <div class="stat-value" id="rp-unknown">0</div>
-                        <div class="stat-download" onclick="downloadFile('Unregistered')">
-                            <i class="fas fa-download"></i>
-                            <span data-i18n="result.download">Download</span>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Total:</span>
-                        <div class="stat-value" id="rp-total">0</div>
-                        <div class="stat-download" onclick="downloadAllResults()">
-                            <i class="fas fa-download"></i>
-                            <span>All Results</span>
-                        </div>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Total:</span>
+                    <div class="result-value" id="rp-total">0</div>
+                    <div class="result-action" onclick="downloadAllResults()">
+                        <i class="fas fa-download"></i>
+                        <span>All Results</span>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- ====== Official Footer Section ====== -->
-    <footer style="background: #0d1117; color: #ccc; padding: 1.5rem 0; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 2rem;">
-        <div class="container">
-            <h5 style="color: #ffffff; margin-bottom: 0.4rem; letter-spacing: 1px;">ER Data Checker</h5>
-            <p style="font-size: 0.9rem; margin: 0; color: #b5b5b5;">
-                Mix & Paid Data Validation Platform
-            </p>
-
-            <p style="margin-top: 1rem; font-size: 0.9rem; color: #b5b5b5;">
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <h5 class="footer-title">ER Data Checker</h5>
+            <p class="footer-description">Mix & Paid Data Validation Platform</p>
+            
+            <p style="margin-bottom: 1.5rem; font-size: 0.9rem;">
                 ⚙️ If the application is not working properly or you encounter any issue,<br>
-                please contact our support team via Email or WhatsApp for quick assistance.
+                please contact our support team for quick assistance.
             </p>
-
-            <hr style="width: 60%; margin: 1rem auto; border-color: rgba(255,255,255,0.1);">
-
-            <p style="font-size: 0.85rem; color: #888;">
+            
+            <div class="footer-links">
+                <a href="https://wa.me/8801795541326" class="footer-link">WhatsApp</a>
+                <a href="https://www.facebook.com/shahriar.shakil.nobab" class="footer-link">Facebook</a>
+                <a href="https://www.facebook.com/er.mailer.software" class="footer-link">Page</a>
+            </div>
+            
+            <p class="footer-copyright">
                 &copy; <span id="year"></span> ER Data Checker. All Rights Reserved.
             </p>
         </div>
     </footer>
-
-    <script>
-        // Auto-update footer year
-        document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
 
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -1412,6 +1297,7 @@
     </script>
 
     <!-- 功能脚本 -->
+    <!-- 功能脚本 -->
     <script>
         // Global Variables
         let editor = null;
@@ -1436,6 +1322,9 @@
         
         // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
+            // Update year
+            document.getElementById('year').textContent = new Date().getFullYear();
+            
             // Initialize CodeMirror editor
             editor = CodeMirror.fromTextArea(document.getElementById('mail-input'), {
                 lineNumbers: true,
@@ -1458,31 +1347,31 @@
             });
         
             // Tab switching
-            $(document).on("click", "#nav-item1", function() {
+            $(document).on("click", "#tab1", function() {
                 model = 1;
-                document.querySelectorAll('.stat-item')[1].style.display = 'flex';
-                document.querySelectorAll('.stat-item')[4].style.display = 'flex';
-                document.querySelectorAll('.stat-item')[2].querySelector('.stat-label').textContent = 'Disabled:';
+                document.querySelectorAll('.result-item')[1].style.display = 'flex';
+                document.querySelectorAll('.result-item')[4].style.display = 'flex';
+                document.querySelectorAll('.result-item')[2].querySelector('.result-label').textContent = 'Disabled:';
                 nums = 200;
                 resetResults();
                 updateActiveTab(this);
             });
             
-            $(document).on("click", "#nav-item2", function() {
+            $(document).on("click", "#tab2", function() {
                 model = 2;
-                document.querySelectorAll('.stat-item')[1].style.display = 'flex';
-                document.querySelectorAll('.stat-item')[4].style.display = 'flex';
-                document.querySelectorAll('.stat-item')[2].querySelector('.stat-label').textContent = 'Disabled:';
+                document.querySelectorAll('.result-item')[1].style.display = 'flex';
+                document.querySelectorAll('.result-item')[4].style.display = 'flex';
+                document.querySelectorAll('.result-item')[2].querySelector('.result-label').textContent = 'Disabled:';
                 nums = 200;
                 resetResults();
                 updateActiveTab(this);
             });
             
-            $(document).on("click", "#nav-item3", function() {
+            $(document).on("click", "#tab3", function() {
                 model = 3;
-                document.querySelectorAll('.stat-item')[1].style.display = 'none';
-                document.querySelectorAll('.stat-item')[4].style.display = 'none';
-                document.querySelectorAll('.stat-item')[2].querySelector('.stat-label').textContent = 'Error:';
+                document.querySelectorAll('.result-item')[1].style.display = 'none';
+                document.querySelectorAll('.result-item')[4].style.display = 'none';
+                document.querySelectorAll('.result-item')[2].querySelector('.result-label').textContent = 'Error:';
                 nums = 1000;
                 resetResults();
                 updateActiveTab(this);
@@ -1567,6 +1456,46 @@
             });
         });
         
+        // Tab switching function
+        function switchTab(tabNumber) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            document.getElementById(`tab${tabNumber}`).classList.add('active');
+            
+            // Update model and settings based on tab
+            if (tabNumber === 1) {
+                model = 1;
+                nums = 200;
+                document.getElementById('processing-speed').textContent = '200/s';
+                document.querySelectorAll('.result-item')[1].style.display = 'flex';
+                document.querySelectorAll('.result-item')[4].style.display = 'flex';
+                document.querySelectorAll('.result-item')[2].querySelector('.result-label').textContent = 'Disabled:';
+                showNotification('info', 'Switched to Sense Core mode (200 emails/second)');
+            } else if (tabNumber === 2) {
+                model = 2;
+                nums = 200;
+                document.getElementById('processing-speed').textContent = '200/s';
+                document.querySelectorAll('.result-item')[1].style.display = 'flex';
+                document.querySelectorAll('.result-item')[4].style.display = 'flex';
+                document.querySelectorAll('.result-item')[2].querySelector('.result-label').textContent = 'Disabled:';
+                showNotification('warning', 'Detailed mode is coming soon. Please use other modes.');
+            } else if (tabNumber === 3) {
+                model = 3;
+                nums = 1000;
+                document.getElementById('processing-speed').textContent = '1000/s';
+                document.querySelectorAll('.result-item')[1].style.display = 'none';
+                document.querySelectorAll('.result-item')[4].style.display = 'none';
+                document.querySelectorAll('.result-item')[2].querySelector('.result-label').textContent = 'Error:';
+                showNotification('info', 'Switched to Fast mode (1000 emails/second)');
+            }
+            
+            resetResults();
+        }
+        
         // Helper Functions
         function generateRandomHex() {
             const randomBytes = crypto.getRandomValues(new Uint8Array(16));
@@ -1608,6 +1537,9 @@
             document.getElementById("rp-not-exist").textContent = "0";
             document.getElementById("rp-disabled").textContent = "0";
             document.getElementById("rp-unknown").textContent = "0";
+            document.getElementById("total-emails").textContent = "0";
+            document.getElementById("valid-emails").textContent = "0";
+            document.getElementById("invalid-emails").textContent = "0";
             updateTotalCount();
         }
         
@@ -1620,6 +1552,10 @@
             
             const total = good + ver + notExist + disabled + unknown;
             document.getElementById("rp-total").textContent = total;
+            
+            // Update valid and invalid counts
+            document.getElementById("valid-emails").textContent = good + ver;
+            document.getElementById("invalid-emails").textContent = notExist + disabled + unknown;
         }
         
         function chunk(arr, number) {
@@ -1813,15 +1749,12 @@
         
         function updateActiveTab(clickedTab) {
             // Remove active class from all tabs
-            document.querySelectorAll('.nav-link-tab').forEach(tab => {
+            document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
             
             // Add active class to clicked tab
-            const linkTab = clickedTab.querySelector('.nav-link-tab');
-            if (linkTab) {
-                linkTab.classList.add('active');
-            }
+            clickedTab.classList.add('active');
         }
 
         // 全局通知函数
@@ -1865,15 +1798,4 @@
         }
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
-
-
