@@ -1386,7 +1386,9 @@
                     resetResults();
                     document.getElementById("mail-progress-bar").style.width = "0%";
                     document.getElementById("mail-progress-bar").textContent = "0%";
-        
+
+                    document.getElementById("total-emails").textContent = mailLines.length;
+                    
                     mails2 = [...mailLines];
         
                     axios.post('https://gmailver.com/php/key.php', { mail: mailLines })
@@ -1495,6 +1497,10 @@
             document.getElementById("total-emails").textContent = "0";
             document.getElementById("valid-emails").textContent = "0";
             document.getElementById("invalid-emails").textContent = "0";
+            document.getElementById("total-emails").textContent = "0";
+            document.getElementById("valid-emails").textContent = "0";
+            document.getElementById("invalid-emails").textContent = "0";
+    
             updateTotalCount();
         }
         
@@ -1592,6 +1598,8 @@
             increaseReport("#rp-not-exist", notExist);
             increaseReport("#rp-unknown", unknown);
             updateTotalCount();
+            document.getElementById("valid-emails").textContent = good + ver;
+            document.getElementById("invalid-emails").textContent = notExist + dis + unknown;
         }
         
         function increaseReport(id, number) {
@@ -1754,6 +1762,7 @@
     </script>
 </body>
 </html>
+
 
 
 
