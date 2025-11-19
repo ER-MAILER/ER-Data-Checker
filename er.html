@@ -419,7 +419,7 @@
         }
         
         .progress {
-            height: 8px;
+            height: 20px;
             background: var(--glass);
             border-radius: 4px;
             overflow: hidden;
@@ -508,61 +508,10 @@
             transform: translateY(-1px);
         }
         
-        /* Tools Section */
-        .tools-section {
-            margin-bottom: 2rem;
-        }
-        
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .tool-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-        }
-        
-        .tool-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .tool-logo {
-            width: 70px;
-            height: 70px;
-            object-fit: contain;
-            margin-bottom: 1rem;
-            transition: transform 0.3s;
-        }
-        
-        .tool-card:hover .tool-logo {
-            transform: scale(1.1);
-        }
-        
-        .tool-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--light);
-        }
-        
         /* Footer */
         .footer {
-            background: var(--darker);
-            color: var(--gray);
+            background: var(--glass);
+            color: var(--light);
             padding: 2rem 0;
             margin-top: 3rem;
             text-align: center;
@@ -570,7 +519,7 @@
         }
         
         .footer-container {
-            max-width: 1200px;
+            max-width: 1200xp;
             margin: 0 auto;
             padding: 0 1.5rem;
         }
@@ -606,7 +555,7 @@
         
         .footer-copyright {
             font-size: 0.85rem;
-            color: var(--gray);
+            color: var(--light);
         }
         
         /* Responsive */
@@ -933,7 +882,7 @@
                 <span data-i18n="mode.fast">fast mode(1000/s)</span>
             </div>
         </div>
-
+        
         <!-- Content Area -->
         <div class="content-area">
             <div class="content-card">
@@ -997,6 +946,15 @@
                 </div>
                 
                 <div class="result-item">
+                    <span class="result-label" data-i18n="result.verified">Verified:</span>
+                    <div class="result-value" id="rp-ver">0</div>
+                    <div class="result-action" onclick="downloadFile('Verify')">
+                        <i class="fas fa-download"></i>
+                        <span data-i18n="result.download">Download</span>
+                    </div>
+                </div>
+                
+                <div class="result-item">
                     <span class="result-label" data-i18n="result.disabled">Disabled:</span>
                     <div class="result-value" id="rp-disabled">0</div>
                     <div class="result-action" onclick="downloadFile('Disabled')">
@@ -1033,8 +991,6 @@
                 </div>
             </div>
         </div>
-        
-    </main>
     
     <!-- Footer -->
     <footer class="footer">
@@ -1297,7 +1253,6 @@
     </script>
 
     <!-- 功能脚本 -->
-    <!-- 功能脚本 -->
     <script>
         // Global Variables
         let editor = null;
@@ -1416,8 +1371,8 @@
                         return;
                     }
         
-                    if (mailLines.length > 20000) {
-                        showNotification('error', 'Please do not exceed 20,000 emails at a time!');
+                    if (mailLines.length > 50000) {
+                        showNotification('error', 'Please do not exceed 50,000 emails at a time!');
                         toggleLoading(false);
                         return;
                     }
